@@ -1,19 +1,23 @@
 {
     "name": "back-techblog",
     "version": "1.0.0",
+    "type": "module",
     "main": "index.js",
     "repository": "https://github.com/ramon541/back-techblog.git",
     "author": "ramon541 <ramondiasmonteiro@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "dev": "tsx watch src/http/server.ts",
+        "dev": "tsx watch src/server.ts",
         "build": "tsc"
     },
     "dependencies": {
         "@prisma/client": "^6.15.0",
-        "prisma": "^6.15.0"
+        "express": "^5.1.0",
+        "prisma": "^6.15.0",
+        "zod": "^4.1.5"
     },
     "devDependencies": {
+        "@types/express": "^5.0.3",
         "@types/node": "^24.3.0",
         "tsx": "^4.20.5",
         "typescript": "^5.9.2"
