@@ -1,7 +1,7 @@
 /**
- * User Controller Layer
+ * Tag Controller Layer
  *
- * This file contains HTTP request handlers for User-related operations.
+ * This file contains HTTP request handlers for Tag-related operations.
  * It serves as the interface between HTTP requests and the business logic layer,
  * handling request validation, response formatting, and error handling.
  *
@@ -10,36 +10,36 @@
  * - Request data validation using Zod schemas
  * - Response formatting and status code management
  * - Error handling and HTTP error responses
- * - Coordination with user service layer
- * - Authentication and authorization checks
+ * - Coordination with tag service layer
+ * - Tag operation logging and monitoring
  */
 import type { RequestHandler } from 'express';
-import { userService } from './user.service.js';
+import { tagService } from './tag.service.js';
 import {
-    createUserSchema,
-    getUserSchema,
-    updateUserSchema,
-} from './user.schema.js';
+    createTagSchema,
+    getTagSchema,
+    updateTagSchema,
+} from './tag.schema.js';
 import logger from '../../utils/logger.js';
 
-const userLogger = logger.createModuleLogger('USER');
+const tagLogger = logger.createModuleLogger('TAG');
 
-export type IApiUserController = IApiControllerBase<RequestHandler>;
+export type IApiTagController = IApiControllerBase<RequestHandler>;
 
-export const userController: IApiUserController = {
+export const tagController: IApiTagController = {
     create: async (req, res, next) => {
         try {
-            userLogger.info('Starting user creation');
+            tagLogger.info('Starting tag creation');
 
-            const validatedData = createUserSchema.parse(req.body);
+            const validatedData = createTagSchema.parse(req.body);
 
-            const result = await userService.create(validatedData);
+            const result = await tagService.create(validatedData);
 
             if (result.success)
-                userLogger.success('User created successfully', {
+                tagLogger.success('Tag created successfully', {
                     id: result.data.id,
                 });
-            else userLogger.warn('User creation failed', result);
+            else tagLogger.warn('Tag creation failed', result);
 
             res.status(result.statusCode).json(result);
             return;
@@ -51,18 +51,18 @@ export const userController: IApiUserController = {
     //= =================================================================================
     get: async (req, res, next) => {
         try {
-            userLogger.info('Starting user retrieval');
+            tagLogger.info('Starting tag retrieval');
             const id = req.params.id;
 
-            const validatedData = getUserSchema.parse({ id });
+            const validatedData = getTagSchema.parse({ id });
 
-            const result = await userService.get(validatedData);
+            const result = await tagService.get(validatedData);
 
             if (result.success)
-                userLogger.success('User retrieved successfully', {
+                tagLogger.success('Tag retrieved successfully', {
                     id: result.data.id,
                 });
-            else userLogger.warn('User retrieval failed', result);
+            else tagLogger.warn('Tag retrieval failed', result);
 
             res.status(result.statusCode).json(result);
             return;
@@ -74,14 +74,14 @@ export const userController: IApiUserController = {
     //= =================================================================================
     getAll: async (_req, res, next) => {
         try {
-            userLogger.info('Starting users retrieval');
-            const result = await userService.getAll();
+            tagLogger.info('Starting tags retrieval');
+            const result = await tagService.getAll();
 
             if (result.success)
-                userLogger.success('Users retrieved successfully', {
+                tagLogger.success('Tags retrieved successfully', {
                     count: result.data.length,
                 });
-            else userLogger.warn('Users retrieval failed', result);
+            else tagLogger.warn('Tags retrieval failed', result);
 
             res.status(result.statusCode).json(result);
             return;
@@ -93,18 +93,18 @@ export const userController: IApiUserController = {
     //= =================================================================================
     update: async (req, res, next) => {
         try {
-            userLogger.info('Starting user update');
+            tagLogger.info('Starting user update');
             const id = req.params.id;
 
-            const validatedData = updateUserSchema.parse({ id, ...req.body });
+            const validatedData = updateTagSchema.parse({ id, ...req.body });
 
-            const result = await userService.update(validatedData);
+            const result = await tagService.update(validatedData);
 
             if (result.success)
-                userLogger.success('User updated successfully', {
+                tagLogger.success('Tag updated successfully', {
                     id: result.data.id,
                 });
-            else userLogger.warn('User update failed', result);
+            else tagLogger.warn('Tag update failed', result);
 
             res.status(result.statusCode).json(result);
             return;
@@ -116,18 +116,18 @@ export const userController: IApiUserController = {
     //= =================================================================================
     delete: async (req, res, next) => {
         try {
-            userLogger.info('Starting user deletion');
+            tagLogger.info('Starting tag deletion');
             const id = req.params.id;
 
-            const validatedData = getUserSchema.parse({ id });
+            const validatedData = getTagSchema.parse({ id });
 
-            const result = await userService.delete(validatedData);
+            const result = await tagService.delete(validatedData);
 
             if (result.success)
-                userLogger.success('User deleted successfully', {
+                tagLogger.success('Tag deleted successfully', {
                     id: result.data.id,
                 });
-            else userLogger.warn('User deletion failed', result);
+            else tagLogger.warn('Tag deletion failed', result);
 
             res.status(result.statusCode).json(result);
             return;
