@@ -19,8 +19,9 @@ try {
 
 //= =================================================================================
 const envSchema = z.object({
-    PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+    PORT: z.coerce.number().min(1).max(65535).default(3000),
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+    BCRYPT_SALT_ROUNDS: z.coerce.number().min(4).max(15).default(12),
 });
 
 const result = envSchema.safeParse(process.env);
