@@ -15,44 +15,39 @@
 import prisma from '../../config/database.js';
 
 export const userRepository = {
-    create: async (data: CreateUserDTO): Promise<User> => {
+    create: async (data: ICreateUserDTO): Promise<IUser> => {
         return prisma.user.create({ data });
     },
 
     //= =================================================================================
-    findByEmail: async (email: Pick<User, 'email'>): Promise<User | null> => {
+    findByEmail: async (email: Pick<IUser, 'email'>): Promise<IUser | null> => {
         return prisma.user.findUnique({
-            where: email,
+            where: { ...email, deletedAt: null },
         });
     },
 
     //= =================================================================================
-    findAll: async (): Promise<Array<User>> => {
-        return prisma.user.findMany({
-            where: { deletedAt: null },
-        });
+    findAll: async (): Promise<Array<IUser>> => {
+        return prisma.user.findMany();
     },
 
     //= =================================================================================
-    findById: async (id: Pick<User, 'id'>): Promise<User | null> => {
+    findById: async (id: Pick<IUser, 'id'>): Promise<IUser | null> => {
         return prisma.user.findUnique({
-            where: id,
+            where: { ...id },
         });
     },
 
     //= =================================================================================
-    update: async (
-        id: Pick<User, 'id'>,
-        data: UpdateUserDTO
-    ): Promise<User> => {
+    update: async ({ id, ...data }: IUpdateUserDTO): Promise<IUser> => {
         return prisma.user.update({
-            where: id,
+            where: { id },
             data,
         });
     },
 
     //= =================================================================================
-    softDelete: async (id: Pick<User, 'id'>): Promise<User> => {
+    softDelete: async (id: Pick<IUser, 'id'>): Promise<IUser> => {
         return prisma.user.update({
             where: id,
             data: { deletedAt: new Date() },
@@ -71,7 +66,7 @@ export const userRepository = {
     findManyWithPagination: async (
         page: number = 1,
         limit: number = 10
-    ): Promise<{ users: Array<User>; total: number }> => {
+    ): Promise<{ users: Array<IUser>; total: number }> => {
         const skip = (page - 1) * limit;
 
         const [users, total] = await Promise.all([

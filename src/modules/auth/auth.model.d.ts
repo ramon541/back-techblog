@@ -5,4 +5,4 @@
  * It defines the data contracts used across authentication layers (service, controller, middleware).
  */
 
-interface LoginCredentials extends Pick<User, 'email' | 'password'> {}
+interface ILoginCredentials extends Pick<User, 'email' | 'password'> {}

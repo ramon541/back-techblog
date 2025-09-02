@@ -24,13 +24,13 @@ export const authService = {
     login: async ({
         email,
         password,
-    }: LoginCredentials): Promise<Result<UserResponseDTO, string>> => {
+    }: ILoginCredentials): Promise<Result<IUserResponseDTO, string>> => {
         try {
             const user = await userRepository.findByEmail({ email });
 
-            if (!user) return Result.error('Email ou Senha inválido');
+            if (!user) return Result.unauthorized('Email ou Senha inválido');
 
-            if (user.deletedAt) return Result.error('Conta desativada');
+            if (user.deletedAt) return Result.forbidden('Conta desativada');
 
             const isValidPassword = await comparePassword(
                 password,
@@ -38,12 +38,12 @@ export const authService = {
             );
 
             if (!isValidPassword)
-                return Result.error('Email ou Senha inválido');
+                return Result.unauthorized('Email ou Senha inválido');
 
             const { password: _, ...userResponse } = user;
-            return Result.success(userResponse);
+            return Result.ok(userResponse, 'Login realizado com sucesso');
         } catch {
-            return Result.error('Erro ao realizar login');
+            return Result.internal('Erro ao realizar login');
         }
     },
 };

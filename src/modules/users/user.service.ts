@@ -14,21 +14,21 @@
  * - Data sanitization before sending to controllers
  */
 
-import { comparePassword, hashPassword } from '../../utils/password.js';
+import { hashPassword } from '../../utils/password.js';
 import { Result } from '../../utils/result.js';
 import { userRepository } from './user.repository.js';
 
 export const userService = {
-    register: async ({
+    create: async ({
         password,
         ...rest
-    }: CreateUserDTO): Promise<Result<UserResponseDTO, string>> => {
+    }: ICreateUserDTO): Promise<Result<IUserResponseDTO, string>> => {
         try {
             const existingUser = await userRepository.findByEmail({
                 email: rest.email,
             });
             if (existingUser)
-                return Result.error('Usuário já cadastrado com esse email');
+                return Result.conflict('Usuário já cadastrado com esse email');
 
             const hashedPassword = await hashPassword(password);
 
@@ -38,79 +38,82 @@ export const userService = {
             });
 
             const { password: _, ...userResponse } = user;
-            return Result.success(userResponse);
+            return Result.created(
+                userResponse,
+                'Usuário registrado com sucesso'
+            );
         } catch {
-            return Result.error('Erro ao registrar usuário');
+            return Result.internal('Erro ao registrar usuário');
         }
     },
 
     //= =================================================================================
-    login: async ({
-        email,
-        password,
-    }: LoginCredentials): Promise<Result<UserResponseDTO, string>> => {
+    get: async (id: Pick<IUser, 'id'>) => {
         try {
-            const user = await userRepository.findByEmail({ email });
-
-            if (!user) return Result.error('Email ou Senha inválido');
-
-            if (user.deletedAt) return Result.error('Conta desativada');
-
-            const isValidPassword = await comparePassword(
-                password,
-                user.password
-            );
-
-            if (!isValidPassword)
-                return Result.error('Email ou Senha inválido');
+            const user = await userRepository.findById(id);
+            if (!user) return Result.notFound('Usuário não encontrado');
 
             const { password: _, ...userResponse } = user;
-            return Result.success(userResponse);
+            return Result.ok(userResponse, 'Usuário encontrado com sucesso');
         } catch {
-            return Result.error('Erro ao realizar login');
+            return Result.internal('Erro ao buscar usuário');
         }
     },
 
     //= =================================================================================
-    deactivateUser: async (
-        id: Pick<User, 'id'>
-    ): Promise<Result<UserResponseDTO, string>> => {
+    getAll: async () => {
+        try {
+            const users = await userRepository.findAll();
+
+            const usersResponse = users.map((user) => {
+                const { password: _, ...userResponse } = user;
+                return userResponse;
+            });
+
+            return Result.ok(usersResponse, 'Usuários buscados com sucesso');
+        } catch {
+            return Result.internal('Erro ao buscar usuários');
+        }
+    },
+
+    //= =================================================================================
+    update: async ({
+        id,
+        ...rest
+    }: IUpdateUserDTO): Promise<Result<IUserResponseDTO, string>> => {
+        try {
+            const user = await userRepository.findById({ id });
+            if (!user) return Result.notFound('Usuário não encontrado');
+
+            const updatedUser = await userRepository.update({
+                id,
+                ...rest,
+            });
+
+            const { password: _, ...userResponse } = updatedUser;
+            return Result.ok(userResponse, 'Usuário atualizado com sucesso');
+        } catch {
+            return Result.internal('Erro ao atualizar usuário');
+        }
+    },
+
+    //= =================================================================================
+    delete: async (
+        id: Pick<IUser, 'id'>
+    ): Promise<Result<IUserResponseDTO, string>> => {
         try {
             const user = await userRepository.findById(id);
-            if (!user) return Result.error('Usuário não encontrado');
+            if (!user) return Result.notFound('Usuário não encontrado');
 
             if (user.deletedAt)
-                return Result.error('Usuário já está desativado');
+                return Result.conflict('Usuário já está desativado');
 
-            const deactivatedUser = await userRepository.update(id, {
-                deletedAt: new Date(),
-            });
+            const deactivatedUser = await userRepository.softDelete(id);
 
             const { password: _, ...userResponse } = deactivatedUser;
-            return Result.success(userResponse);
+            return Result.ok(userResponse, 'Usuário desativado com sucesso');
         } catch {
-            return Result.error('Erro ao desativar usuário');
-        }
-    },
-
-    //= =================================================================================
-    reactivateUser: async (
-        id: Pick<User, 'id'>
-    ): Promise<Result<UserResponseDTO, string>> => {
-        try {
-            const user = await userRepository.findById(id);
-            if (!user) return Result.error('Usuário não encontrado');
-
-            if (!user.deletedAt) return Result.error('Usuário já está ativo');
-
-            const reactivatedUser = await userRepository.update(id, {
-                deletedAt: null,
-            });
-
-            const { password: _, ...userResponse } = reactivatedUser;
-            return Result.success(userResponse);
-        } catch {
-            return Result.error('Erro ao reativar usuário');
+            return Result.internal('Erro ao desativar usuário');
         }
     },
 };

@@ -6,7 +6,7 @@
  */
 
 // Core entity
-interface User {
+interface IUser {
     id: string;
     name: string;
     email: string;
@@ -18,10 +18,11 @@ interface User {
 }
 
 // DTOs (Data Transfer Objects)
-interface CreateUserDTO
-    extends Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'> {}
+interface ICreateUserDTO
+    extends Omit<IUser, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'> {}
 
-interface UpdateUserDTO
-    extends Partial<Pick<User, 'name' | 'avatar' | 'deletedAt'>> {}
+interface IUpdateUserDTO
+    extends Pick<IUser, 'id'>,
+        Partial<Pick<IUser, 'name' | 'email' | 'avatar'>> {}
 
-interface UserResponseDTO extends Omit<User, 'password'> {}
+interface IUserResponseDTO extends Omit<IUser, 'password'> {}
