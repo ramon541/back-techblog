@@ -4,5 +4,4 @@
  * This file contains all TypeScript interfaces and types related to authentication operations.
  * It defines the data contracts used across authentication layers (service, controller, middleware).
  */
-
 interface ILoginCredentials extends Pick<User, 'email' | 'password'> {}

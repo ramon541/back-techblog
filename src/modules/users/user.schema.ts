@@ -5,7 +5,6 @@
  * These schemas are used for request validation in controllers and middleware,
  * ensuring data integrity and type safety at the API boundary.
  */
-
 import { z } from 'zod';
 
 const MIN_NAME_LENGTH = 3;

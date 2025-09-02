@@ -11,7 +11,6 @@
  * - Data persistence and retrieval
  * - Soft delete implementation
  */
-
 import prisma from '../../config/database.js';
 
 export const userRepository = {

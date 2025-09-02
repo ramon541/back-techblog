@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { ZodError } from 'zod';
-import { Result } from '../utils/result.js';
+import { ApplicationErrorEnum, Result } from '../utils/result.js';
 import logger from '../utils/logger.js';
 
 const errorLogger = logger.createModuleLogger('ERROR');
@@ -17,7 +17,10 @@ async function errorHandler(
     if (err instanceof ZodError) {
         const fieldErrors = err.issues.map((error) => error.message);
 
-        const validationError = Result.validation(fieldErrors);
+        const validationError = Result.error(
+            ApplicationErrorEnum.ValidationError,
+            fieldErrors
+        );
 
         res.status(validationError.statusCode).json(validationError);
         return;

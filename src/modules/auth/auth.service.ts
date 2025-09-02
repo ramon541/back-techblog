@@ -15,9 +15,8 @@
  * - Token refresh operations
  * - Password reset functionality
  */
-
 import { comparePassword } from '../../utils/password.js';
-import { Result } from '../../utils/result.js';
+import { ApplicationErrorEnum, Result } from '../../utils/result.js';
 import { userRepository } from '../users/user.repository.js';
 
 export const authService = {
@@ -28,9 +27,17 @@ export const authService = {
         try {
             const user = await userRepository.findByEmail({ email });
 
-            if (!user) return Result.unauthorized('Email ou Senha inválido');
+            if (!user)
+                return Result.error(
+                    ApplicationErrorEnum.Unauthorized,
+                    'Email ou Senha inválido'
+                );
 
-            if (user.deletedAt) return Result.forbidden('Conta desativada');
+            if (user.deletedAt)
+                return Result.error(
+                    ApplicationErrorEnum.Forbidden,
+                    'Conta desativada'
+                );
 
             const isValidPassword = await comparePassword(
                 password,
@@ -38,12 +45,18 @@ export const authService = {
             );
 
             if (!isValidPassword)
-                return Result.unauthorized('Email ou Senha inválido');
+                return Result.error(
+                    ApplicationErrorEnum.Unauthorized,
+                    'Email ou Senha inválido'
+                );
 
             const { password: _, ...userResponse } = user;
             return Result.ok(userResponse, 'Login realizado com sucesso');
         } catch {
-            return Result.internal('Erro ao realizar login');
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao realizar login'
+            );
         }
     },
 };

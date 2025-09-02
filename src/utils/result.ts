@@ -35,6 +35,20 @@ const ErrorStatusCodeMap: Record<ApplicationErrorEnum, number> = {
 };
 
 //= =================================================================================
+const DefaultErrorMessages: Record<ApplicationErrorEnum, string> = {
+    [ApplicationErrorEnum.RequiredField]: 'Campo obrigatório',
+    [ApplicationErrorEnum.InvalidField]: 'Campo inválido',
+    [ApplicationErrorEnum.ValidationError]: 'Dados inválidos',
+    [ApplicationErrorEnum.NotFound]: 'Recurso não encontrado',
+    [ApplicationErrorEnum.Unauthorized]: 'Não autorizado',
+    [ApplicationErrorEnum.Forbidden]: 'Acesso negado',
+    [ApplicationErrorEnum.Conflict]: 'Conflito de dados',
+    [ApplicationErrorEnum.InfrastructureError]: 'Erro interno do servidor',
+    [ApplicationErrorEnum.DatabaseError]: 'Erro no banco de dados',
+    [ApplicationErrorEnum.ExternalServiceError]: 'Erro em serviço externo',
+};
+
+//= =================================================================================
 export class ApplicationException extends Error {
     public readonly genericTypeError: ApplicationErrorEnum;
     public readonly statusCode: number;
@@ -62,59 +76,10 @@ export class ApplicationException extends Error {
         return new ApplicationException(message, type);
     }
 
-    static notFound(
-        message: string | string[] = 'Recurso não encontrado'
-    ): ApplicationException {
-        return new ApplicationException(message, ApplicationErrorEnum.NotFound);
-    }
-
-    static unauthorized(
-        message: string | string[] = 'Não autorizado'
-    ): ApplicationException {
-        return new ApplicationException(
-            message,
-            ApplicationErrorEnum.Unauthorized
-        );
-    }
-
-    static forbidden(
-        message: string | string[] = 'Acesso negado'
-    ): ApplicationException {
-        return new ApplicationException(
-            message,
-            ApplicationErrorEnum.Forbidden
-        );
-    }
-
-    static conflict(
-        message: string | string[] = 'Conflito de dados'
-    ): ApplicationException {
-        return new ApplicationException(message, ApplicationErrorEnum.Conflict);
-    }
-
-    static validation(
-        message: string | string[] = 'Dados inválidos'
-    ): ApplicationException {
-        return new ApplicationException(
-            message,
-            ApplicationErrorEnum.ValidationError
-        );
-    }
-
-    static internal(
-        message: string | string[] = 'Erro interno do servidor'
-    ): ApplicationException {
-        return new ApplicationException(
-            message,
-            ApplicationErrorEnum.InfrastructureError
-        );
-    }
-
     is(type: ApplicationErrorEnum): boolean {
         return this.genericTypeError === type;
     }
 
-    // Retorna mensagem única ou array baseado na quantidade
     getMessages(): string | string[] {
         return this.messages.length === 1
             ? this.messages[0] ?? ''
@@ -160,9 +125,32 @@ export const Result = {
     }),
 
     error: <E = ApplicationException>(
-        error: E | string | string[],
+        error: E | string | string[] | ApplicationErrorEnum,
+        messageOrStatusCode?: string | string[] | number,
         statusCode?: number
     ): Result<never, E> => {
+        if (
+            typeof error === 'string' &&
+            Object.values(ApplicationErrorEnum).includes(
+                error as ApplicationErrorEnum
+            )
+        ) {
+            const errorType = error as ApplicationErrorEnum;
+            const message =
+                typeof messageOrStatusCode === 'string' ||
+                Array.isArray(messageOrStatusCode)
+                    ? messageOrStatusCode
+                    : DefaultErrorMessages[errorType];
+
+            const exception = new ApplicationException(message, errorType);
+            return {
+                success: false,
+                data: null,
+                error: exception.getMessages(),
+                statusCode: exception.statusCode,
+            };
+        }
+
         if (error instanceof ApplicationException) {
             return {
                 success: false,
@@ -172,12 +160,16 @@ export const Result = {
             };
         }
 
+        // String ou array de strings
         if (typeof error === 'string' || Array.isArray(error)) {
             return {
                 success: false,
                 data: null,
                 error: error,
-                statusCode: statusCode || 500,
+                statusCode:
+                    typeof messageOrStatusCode === 'number'
+                        ? messageOrStatusCode
+                        : statusCode || 500,
             };
         }
 
@@ -194,34 +186,4 @@ export const Result = {
 
     created: <T>(data: T, message?: string): Result<T, never> =>
         Result.success(data, message || 'Recurso criado com sucesso', 201),
-
-    notFound: (
-        message?: string | string[]
-    ): Result<never, ApplicationException> =>
-        Result.error(ApplicationException.notFound(message)),
-
-    unauthorized: (
-        message?: string | string[]
-    ): Result<never, ApplicationException> =>
-        Result.error(ApplicationException.unauthorized(message)),
-
-    forbidden: (
-        message?: string | string[]
-    ): Result<never, ApplicationException> =>
-        Result.error(ApplicationException.forbidden(message)),
-
-    conflict: (
-        message?: string | string[]
-    ): Result<never, ApplicationException> =>
-        Result.error(ApplicationException.conflict(message)),
-
-    validation: (
-        message?: string | string[]
-    ): Result<never, ApplicationException> =>
-        Result.error(ApplicationException.validation(message)),
-
-    internal: (
-        message?: string | string[]
-    ): Result<never, ApplicationException> =>
-        Result.error(ApplicationException.internal(message)),
 };

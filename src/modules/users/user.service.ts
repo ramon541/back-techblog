@@ -13,9 +13,8 @@
  * - Coordination between multiple repositories if needed
  * - Data sanitization before sending to controllers
  */
-
 import { hashPassword } from '../../utils/password.js';
-import { Result } from '../../utils/result.js';
+import { ApplicationErrorEnum, Result } from '../../utils/result.js';
 import { userRepository } from './user.repository.js';
 
 export const userService = {
@@ -28,7 +27,10 @@ export const userService = {
                 email: rest.email,
             });
             if (existingUser)
-                return Result.conflict('Usuário já cadastrado com esse email');
+                return Result.error(
+                    ApplicationErrorEnum.Conflict,
+                    'Usuário já cadastrado com esse email'
+                );
 
             const hashedPassword = await hashPassword(password);
 
@@ -43,7 +45,10 @@ export const userService = {
                 'Usuário registrado com sucesso'
             );
         } catch {
-            return Result.internal('Erro ao registrar usuário');
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao registrar usuário'
+            );
         }
     },
 
@@ -51,12 +56,19 @@ export const userService = {
     get: async (id: Pick<IUser, 'id'>) => {
         try {
             const user = await userRepository.findById(id);
-            if (!user) return Result.notFound('Usuário não encontrado');
+            if (!user)
+                return Result.error(
+                    ApplicationErrorEnum.NotFound,
+                    'Usuário não encontrado'
+                );
 
             const { password: _, ...userResponse } = user;
             return Result.ok(userResponse, 'Usuário encontrado com sucesso');
         } catch {
-            return Result.internal('Erro ao buscar usuário');
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao buscar usuário'
+            );
         }
     },
 
@@ -72,7 +84,10 @@ export const userService = {
 
             return Result.ok(usersResponse, 'Usuários buscados com sucesso');
         } catch {
-            return Result.internal('Erro ao buscar usuários');
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao buscar usuários'
+            );
         }
     },
 
@@ -83,7 +98,11 @@ export const userService = {
     }: IUpdateUserDTO): Promise<Result<IUserResponseDTO, string>> => {
         try {
             const user = await userRepository.findById({ id });
-            if (!user) return Result.notFound('Usuário não encontrado');
+            if (!user)
+                return Result.error(
+                    ApplicationErrorEnum.NotFound,
+                    'Usuário não encontrado'
+                );
 
             const updatedUser = await userRepository.update({
                 id,
@@ -93,7 +112,10 @@ export const userService = {
             const { password: _, ...userResponse } = updatedUser;
             return Result.ok(userResponse, 'Usuário atualizado com sucesso');
         } catch {
-            return Result.internal('Erro ao atualizar usuário');
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao atualizar usuário'
+            );
         }
     },
 
@@ -103,17 +125,27 @@ export const userService = {
     ): Promise<Result<IUserResponseDTO, string>> => {
         try {
             const user = await userRepository.findById(id);
-            if (!user) return Result.notFound('Usuário não encontrado');
+            if (!user)
+                return Result.error(
+                    ApplicationErrorEnum.NotFound,
+                    'Usuário não encontrado'
+                );
 
             if (user.deletedAt)
-                return Result.conflict('Usuário já está desativado');
+                return Result.error(
+                    ApplicationErrorEnum.Conflict,
+                    'Usuário já está desativado'
+                );
 
             const deactivatedUser = await userRepository.softDelete(id);
 
             const { password: _, ...userResponse } = deactivatedUser;
             return Result.ok(userResponse, 'Usuário desativado com sucesso');
         } catch {
-            return Result.internal('Erro ao desativar usuário');
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao desativar usuário'
+            );
         }
     },
 };

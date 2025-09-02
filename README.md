@@ -320,43 +320,82 @@ type Result<T, E = ApplicationException> =
       };
 ```
 
-**ApplicationException com Tipos Específicos:**
+**ApplicationErrorEnum - Tipos de Erro Padronizados:**
 
 ```typescript
 enum ApplicationErrorEnum {
     // Client Errors (4xx)
-    RequiredField = 'REQUIRED_FIELD', // 400
-    InvalidField = 'INVALID_FIELD', // 400
-    NotFound = 'NOT_FOUND', // 404
-    Unauthorized = 'UNAUTHORIZED', // 401
-    Forbidden = 'FORBIDDEN', // 403
-    Conflict = 'CONFLICT', // 409
-    ValidationError = 'VALIDATION_ERROR', // 400
+    RequiredField = 'REQUIRED_FIELD', // 400 - Campo obrigatório
+    InvalidField = 'INVALID_FIELD', // 400 - Campo inválido
+    ValidationError = 'VALIDATION_ERROR', // 400 - Dados inválidos
+    Unauthorized = 'UNAUTHORIZED', // 401 - Não autorizado
+    Forbidden = 'FORBIDDEN', // 403 - Acesso negado
+    NotFound = 'NOT_FOUND', // 404 - Recurso não encontrado
+    Conflict = 'CONFLICT', // 409 - Conflito de dados
 
     // Server Errors (5xx)
-    InfrastructureError = 'INFRASTRUCTURE_ERROR', // 500
-    DatabaseError = 'DATABASE_ERROR', // 500
-    ExternalServiceError = 'EXTERNAL_SERVICE_ERROR', // 502
+    InfrastructureError = 'INFRASTRUCTURE_ERROR', // 500 - Erro interno
+    DatabaseError = 'DATABASE_ERROR', // 500 - Erro no banco
+    ExternalServiceError = 'EXTERNAL_SERVICE_ERROR', // 502 - Erro externo
 }
+```
+
+**Métodos Disponíveis do Result:**
+
+```typescript
+// ✅ Sucesso
+Result.success(data, message?, statusCode?)  // Genérico
+Result.ok(data, message?)                    // 200 OK
+Result.created(data, message?)               // 201 Created
+
+// ❌ Erro - Nova Sintaxe Simplificada
+Result.error(ApplicationErrorEnum.NotFound)                    // Mensagem padrão
+Result.error(ApplicationErrorEnum.NotFound, 'Custom message')  // Mensagem customizada
+Result.error(ApplicationErrorEnum.ValidationError, ['erro1', 'erro2'])  // Múltiplas mensagens
+
+// ❌ Também aceita string/array diretamente
+Result.error('Erro customizado', statusCode?)
+Result.error(['Erro 1', 'Erro 2'], statusCode?)
 ```
 
 ### Exemplo de Uso do Result Pattern
 
 ```typescript
-// Service Layer
+// Service Layer - Nova Sintaxe
 export const userService = {
     async create(data: CreateUserDTO): Promise<Result<UserResponseDTO>> {
         try {
             const existingUser = await userRepository.findByEmail(data.email);
 
+            // ✅ Nova sintaxe com ApplicationErrorEnum
             if (existingUser) {
-                return Result.conflict('Usuário já cadastrado com esse email');
+                return Result.error(
+                    ApplicationErrorEnum.Conflict,
+                    'Usuário já cadastrado com esse email'
+                );
             }
 
             const user = await userRepository.create(data);
             return Result.created(user, 'Usuário criado com sucesso');
         } catch (error) {
-            return Result.internal('Erro ao criar usuário');
+            // ✅ Uso direto do enum
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao criar usuário'
+            );
+        }
+    },
+
+    async get(id: string): Promise<Result<UserResponseDTO>> {
+        try {
+            const user = await userRepository.findById({ id });
+
+            // ✅ Sintaxe limpa sem mensagem customizada (usa padrão)
+            if (!user) return Result.error(ApplicationErrorEnum.NotFound);
+
+            return Result.ok(user);
+        } catch {
+            return Result.error(ApplicationErrorEnum.InfrastructureError);
         }
     },
 };
@@ -367,11 +406,20 @@ export const userController = {
         const validatedData = createUserSchema.parse(req.body);
         const result = await userService.create(validatedData);
 
-        // Result já vem com statusCode apropriado
+        // Result já vem com statusCode apropriado automaticamente
         return res.status(result.statusCode).json(result);
     },
 };
 ```
+
+**Vantagens da Nova Implementação:**
+
+-   ✅ **Sintaxe Limpa**: `Result.error(ApplicationErrorEnum.NotFound)`
+-   ✅ **Type Safety**: Enum previne erros de digitação
+-   ✅ **Consistência**: Status codes automáticos por tipo de erro
+-   ✅ **Mensagens Padrão**: Fallback automático para mensagens em português
+-   ✅ **Flexibilidade**: Aceita mensagens customizadas e arrays
+-   ✅ **Manutenibilidade**: Centralização dos tipos de erro
 
 ## 🔧 Funcionalidades Implementadas
 
@@ -430,13 +478,20 @@ PUT    /api/users/:id       # Atualizar usuário
 DELETE /api/users/:id       # Soft delete usuário
 ```
 
-### Autenticação (em desenvolvimento)
+### Autenticação
 
 ```http
-POST   /api/auth/login      # Login
-POST   /api/auth/logout     # Logout
-GET    /api/auth/me         # Perfil do usuário
-POST   /api/auth/refresh    # Refresh token
+POST   /api/auth/login      # Login com email/senha
+```
+
+### Artigos (planejado)
+
+```http
+POST   /api/articles        # Criar artigo
+GET    /api/articles        # Listar artigos
+GET    /api/articles/:id    # Buscar artigo por ID
+PUT    /api/articles/:id    # Atualizar artigo
+DELETE /api/articles/:id    # Deletar artigo
 ```
 
 ### Respostas Padronizadas
@@ -467,15 +522,16 @@ POST   /api/auth/refresh    # Refresh token
 
 ## 🚧 Roadmap
 
+### ✅ Recentemente Implementado
+
+-   **🔐 Sistema de Login** - Autenticação com email/senha completa
+-   **📝 Auth Controller** - Endpoint `/api/auth/login` funcional
+-   **🛠️ Result Pattern Aprimorado** - Sintaxe `Result.error(ApplicationErrorEnum.NotFound)`
+-   **🔧 Error Handler** - Integração com ApplicationErrorEnum
+-   **📋 Auth Schemas** - Validação Zod para credenciais de login
+-   **🏗️ Auth Service** - Validação de credenciais e status de conta
+
 ### Funcionalidades Planejadas
-
-#### 🔐 Autenticação Completa
-
--   [ ] **JWT Authentication** - Tokens seguros com refresh
--   [ ] **Rate Limiting** - Proteção contra ataques
--   [ ] **Password Reset** - Reset via email
--   [ ] **Email Verification** - Confirmação de conta
--   [ ] **OAuth Integration** - Login social (Google, GitHub)
 
 #### 📝 Sistema de Artigos
 

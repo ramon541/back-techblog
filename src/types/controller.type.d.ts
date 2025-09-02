@@ -5,3 +5,7 @@ interface IApiControllerBase<T> {
     update: T;
     delete: T;
 }
+
+interface IApiAuthControllerBase<T> {
+    login: T;
+}
