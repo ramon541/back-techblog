@@ -641,7 +641,7 @@ furnished to do so, subject to the following conditions:
 
 [![GitHub](https://img.shields.io/badge/GitHub-ramon541-black?style=for-the-badge&logo=github)](https://github.com/ramon541)
 [![Email](https://img.shields.io/badge/Email-ramondiasmonteiro@gmail.com-red?style=for-the-badge&logo=gmail)](mailto:ramondiasmonteiro@gmail.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/ramon-monteiro)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/ramondiasmonteiro)
 
 </div>
 

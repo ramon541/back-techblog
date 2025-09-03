@@ -8,7 +8,10 @@
 import { z } from 'zod';
 
 const MIN_NAME_LENGTH = 3;
+const MAX_NAME_LENGTH = 50;
+
 const MIN_PASSWORD_LENGTH = 6;
+const MAX_PASSWORD_LENGTH = 16;
 
 //= =================================================================================
 export const createUserSchema = z.object({
@@ -17,6 +20,10 @@ export const createUserSchema = z.object({
         .min(
             MIN_NAME_LENGTH,
             `Nome deve ter no mínimo ${MIN_NAME_LENGTH} caracteres`
+        )
+        .max(
+            MAX_NAME_LENGTH,
+            `Nome deve ter no máximo ${MAX_NAME_LENGTH} caracteres`
         ),
     email: z.email('Email inválido'),
     password: z
@@ -24,6 +31,10 @@ export const createUserSchema = z.object({
         .min(
             MIN_PASSWORD_LENGTH,
             `Senha deve ter no mínimo ${MIN_PASSWORD_LENGTH} caracteres`
+        )
+        .max(
+            MAX_PASSWORD_LENGTH,
+            `Senha deve ter no máximo ${MAX_PASSWORD_LENGTH} caracteres`
         ),
     avatar: z
         .union([z.url('Avatar deve ser uma URL válida'), z.null()])
@@ -44,6 +55,10 @@ export const updateUserSchema = z.object({
         .min(
             MIN_NAME_LENGTH,
             `Nome deve ter no mínimo ${MIN_NAME_LENGTH} caracteres`
+        )
+        .max(
+            MAX_NAME_LENGTH,
+            `Nome deve ter no máximo ${MAX_NAME_LENGTH} caracteres`
         )
         .optional(),
     email: z.email('Email inválido').optional(),
