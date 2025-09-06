@@ -25,7 +25,7 @@ export const articleRepository = {
         term,
         page = 1,
         limit = 10,
-    }: IArticleSearchDTO): Promise<IArticle[]> => {
+    }: IArticleSearchDTO): Promise<Array<IArticle>> => {
         return prisma.article.findMany({
             where: {
                 deletedAt: null,

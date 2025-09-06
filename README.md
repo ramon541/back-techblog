@@ -1,313 +1,107 @@
-# 📝 TechBlog Backend API
+# 🏗️ TechBlog Backend - Documentação Técnica
 
-> Uma API RESTful robusta para um blog de tecnologia, construída com Node.js, TypeScript, Express e Prisma, seguindo princípios de Clean Architecture e padrões modernos de desenvolvimento.
+## 📋 Concepção do Projeto
 
-## 🚀 Tecnologias
+### Visão Geral
 
--   **Node.js 18+** - Runtime JavaScript/TypeScript
--   **TypeScript 5.9** - Tipagem estática e segurança de código
--   **Express 5.1** - Framework web minimalista e flexível
--   **Prisma 6.15** - ORM moderno com type-safety
--   **MySQL** - Sistema de gerenciamento de banco de dados
--   **Bcrypt** - Hash seguro de senhas
--   **Zod** - Validação de dados e schemas TypeScript-first
--   **TSX** - TypeScript execution e hot-reload
+O **TechBlog Backend** foi concebido como uma API RESTful robusta para gerenciar um blog de tecnologia, priorizando **escalabilidade**, **manutenibilidade** e **qualidade de código**. O projeto foi arquitetado seguindo princípios de **Clean Architecture** e padrões modernos de desenvolvimento, com foco na experiência do desenvolvedor e na facilidade de evolução do sistema.
 
-## 🏗️ Arquitetura
+### Objetivos do Projeto
+
+1. **Demonstrar Best Practices** - Implementar padrões de arquitetura e código de alta qualidade
+2. **Escalabilidade** - Estrutura preparada para crescimento e novas funcionalidades
+3. **Manutenibilidade** - Código limpo, bem documentado e fácil de modificar
+4. **Type Safety** - Aproveitamento máximo do TypeScript para prevenir erros
+5. **Observabilidade** - Sistema de logs e monitoramento para ambiente de produção
+
+---
+
+## 🎯 Decisões Técnicas e Justificativas
+
+### Stack Principal
+
+#### **Node.js + TypeScript**
+
+-   **Decisão**: Utilizar TypeScript como linguagem principal
+-   **Justificativa**:
+    -   Type safety em tempo de compilação reduz bugs em produção
+    -   Melhor IntelliSense e refactoring
+    -   Facilita manutenção em projetos de médio/grande porte
+    -   Comunidade ativa e ecossistema maduro
+
+#### **Express.js 5.1**
+
+-   **Decisão**: Framework web minimalista
+-   **Justificativa**:
+    -   Flexibilidade para implementar arquitetura customizada
+    -   Performance comprovada em produção
+    -   Vasto ecossistema de middlewares
+    -   Controle total sobre estrutura de rotas
+
+#### **Prisma ORM**
+
+-   **Decisão**: ORM moderno com geração de tipos
+-   **Justificativa**:
+    -   Type safety automático baseado no schema
+    -   Migrations versionadas e confiáveis
+    -   Query builder intuitivo e performático
+    -   Excelente integração com TypeScript
+    -   Schema declarativo facilita evolução do banco
+
+#### **MySQL**
+
+-   **Decisão**: Banco relacional estabelecido
+-   **Justificativa**:
+    -   Relacionamentos complexos entre entidades (artigos, tags, comentários)
+    -   ACID compliance para consistência de dados
+    -   Performance comprovada para aplicações web
+    -   Ferramentas maduras de backup e monitoramento
+
+---
+
+## 🏛️ Arquitetura e Padrões de Design
+
+### Clean Architecture
+
+O projeto implementa uma variação de Clean Architecture com separação clara de responsabilidades:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Controllers                          │
+│              (HTTP/REST Interface)                      │
+├─────────────────────────────────────────────────────────┤
+│                     Services                            │
+│               (Business Logic)                          │
+├─────────────────────────────────────────────────────────┤
+│                   Repositories                          │
+│              (Data Access Layer)                        │
+├─────────────────────────────────────────────────────────┤
+│                   Database                              │
+│               (MySQL + Prisma)                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### **Controllers**
+
+-   **Responsabilidade**: Interface HTTP, validação de entrada, formatação de resposta
+-   **Justificativa**: Isolamento da lógica de apresentação
+-   **Implementação**: Thin controllers que delegam para services
+
+#### **Services**
+
+-   **Responsabilidade**: Regras de negócio, orquestração, transformação de dados
+-   **Justificativa**: Centralização da lógica de negócio, facilitando testes unitários
+-   **Implementação**: Pure functions quando possível, uso do Result Pattern
+
+#### **Repositories**
+
+-   **Responsabilidade**: Acesso a dados, queries, persistência
+-   **Justificativa**: Abstração do banco de dados, facilita testes e troca de tecnologia
+-   **Implementação**: Interface consistente independente da fonte de dados
 
 ### Padrões Implementados
 
--   **Result Pattern** - Tratamento funcional de erros sem exceptions
--   **Repository Pattern** - Abstração da camada de dados
--   **Service Layer** - Lógica de negócio centralizada
--   **Controller Layer** - Interface HTTP/REST
--   **Dependency Injection** - Inversão de dependências
--   **Clean Architecture** - Separação clara de responsabilidades
-
-### Estrutura do Projeto
-
-```
-back-techblog/
-├── src/
-│   ├── app.ts                    # Configuração do Express
-│   ├── server.ts                 # Inicialização do servidor
-│   ├── config/                   # Configurações da aplicação
-│   │   ├── database.ts           # Configuração Prisma + logs
-│   │   └── env.ts                # Validação de variáveis de ambiente
-│   ├── middlewares/              # Middlewares customizados
-│   │   ├── errorHandler.middleware.ts    # Tratamento global de erros
-│   │   └── requestLogging.middleware.ts  # Logging de requisições
-│   ├── modules/                # Módulos da aplicação (Domain-driven)
-│   │   ├── auth/               # Módulo de autenticação
-│   │   │   ├── auth.controller.ts
-│   │   │   ├── auth.service.ts
-│   │   │   ├── auth.schema.ts  # Validações Zod
-│   │   │   └── auth.model.d.ts # Tipos TypeScript
-│   │   └── users/              # Módulo de usuários
-│   │       ├── user.controller.ts
-│   │       ├── user.service.ts
-│   │       ├── user.repository.ts
-│   │       ├── user.routes.ts
-│   │       ├── user.schema.ts
-│   │       └── user.model.d.ts
-│   ├── routes/                  # Roteamento principal
-│   │   └── index.ts
-│   ├── types/                   # Tipos globais
-│   │   └── controller.type.d.ts
-│   ├── utils/                  # Utilitários compartilhados
-│   │   ├── logger.ts           # Sistema de logs estruturado
-│   │   ├── password.ts         # Utilitários de criptografia
-│   │   └── result.ts           # Result Pattern + ApplicationException
-│   └── generated/              # Código gerado pelo Prisma
-├── prisma/
-│   ├── schema.prisma           # Schema do banco de dados
-│   └── migrations/             # Migrações do banco
-├── tsconfig.json               # Configuração TypeScript
-├── package.json                # Dependencies e scripts
-└── .env.example                # Template de variáveis de ambiente
-```
-
-## 🗃️ Modelo de Dados
-
-### Entidades Principais
-
-#### User (Usuário)
-
-```typescript
-{
-  id: string           # UUID único
-  name: string         # Nome do usuário
-  email: string        # Email único (constraint de unicidade)
-  password: string     # Senha hasheada com bcrypt
-  avatar?: string      # URL do avatar (opcional)
-  deletedAt?: Date     # Soft delete timestamp
-  createdAt: Date      # Data de criação (auto)
-  updatedAt: Date      # Data de atualização (auto)
-
-  // Relacionamentos
-  articles: Article[]  # Artigos do usuário
-  comments: Comment[]  # Comentários do usuário
-}
-```
-
-#### Article (Artigo)
-
-```typescript
-{
-  id: string           # UUID único
-  title: string        # Título do artigo
-  content: string      # Conteúdo em markdown/texto
-  authorId: string     # FK para User
-  deletedAt?: Date     # Soft delete timestamp
-  createdAt: Date      # Data de criação (auto)
-  updatedAt: Date      # Data de atualização (auto)
-
-  // Relacionamentos
-  author: User         # Autor do artigo
-  tags: ArticleTag[]   # Tags do artigo (many-to-many)
-  comments: Comment[]  # Comentários do artigo
-}
-```
-
-#### Tag (Etiqueta)
-
-```typescript
-{
-  id: string           # UUID único
-  name: string         # Nome da tag (único)
-  deletedAt?: Date     # Soft delete timestamp
-  createdAt: Date      # Data de criação (auto)
-
-  // Relacionamentos
-  articles: ArticleTag[] # Artigos com esta tag
-}
-```
-
-#### Comment (Comentário)
-
-```typescript
-{
-  id: string           # UUID único
-  content: string      # Conteúdo do comentário
-  articleId: string    # FK para Article
-  userId: string       # FK para User
-  parentId?: string    # FK para Comment (comentários aninhados)
-  deletedAt?: Date     # Soft delete timestamp
-  createdAt: Date      # Data de criação (auto)
-
-  // Relacionamentos
-  article: Article     # Artigo comentado
-  user: User          # Autor do comentário
-  parent?: Comment    # Comentário pai (se é resposta)
-  replies: Comment[]  # Respostas ao comentário
-}
-```
-
-#### ArticleTag (Relacionamento Many-to-Many)
-
-```typescript
-{
-  articleId: string    # FK para Article
-  tagId: string        # FK para Tag
-  deletedAt?: Date     # Soft delete timestamp
-
-  // Chave composta: [articleId, tagId]
-}
-```
-
-### Características do Modelo
-
--   **UUIDs**: Identificadores únicos universais para todas as entidades
--   **Soft Delete**: Exclusão lógica com timestamp (preserva dados)
--   **Timestamps**: Criação e atualização automáticas
--   **Relacionamentos**: Foreign keys com cascade delete
--   **Constraints**: Unicidade em emails e nomes de tags
--   **Comentários Aninhados**: Suporte a threads de discussão
-
-## 🛠️ Configuração e Instalação
-
-### Pré-requisitos
-
--   **Node.js 18+** - [Download](https://nodejs.org/)
--   **MySQL 8.0+** - [Download](https://dev.mysql.com/downloads/)
--   **Yarn** ou **NPM** - Gerenciador de pacotes
-
-### 1. Clone e instale dependências
-
-```bash
-# Clone o repositório
-git clone https://github.com/ramon541/back-techblog.git
-cd back-techblog
-
-# Instale as dependências
-yarn install
-# ou
-npm install
-```
-
-### 2. Configure o banco de dados
-
-```bash
-# Crie o banco de dados MySQL
-mysql -u root -p
-CREATE DATABASE techblog CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-### 3. Configure as variáveis de ambiente
-
-```bash
-# Copie o arquivo de exemplo
-cp .env.example .env
-
-# Edite o arquivo .env com suas configurações
-nano .env
-```
-
-**Arquivo `.env`:**
-
-```env
-# Database
-DATABASE_URL="mysql://username:password@localhost:3306/techblog"
-
-# Application
-PORT=3000
-
-# Security
-BCRYPT_SALT_ROUNDS=12
-```
-
-### 4. Execute as migrações do banco
-
-```bash
-# Gere o cliente Prisma
-yarn prisma:gen
-
-# Execute as migrações
-yarn prisma:dev
-
-# (Opcional) Visualize os dados
-yarn prisma studio
-```
-
-### 5. Inicie o servidor
-
-```bash
-# Modo desenvolvimento (hot-reload)
-yarn dev
-
-# Build para produção
-yarn build
-node dist/server.js
-```
-
-**✅ Servidor rodando em:** `http://localhost:3000`
-
-## 📚 Scripts Disponíveis
-
-```bash
-# Desenvolvimento
-yarn dev              # Inicia servidor com hot-reload
-yarn build            # Compila TypeScript para JavaScript
-
-# Banco de dados
-yarn prisma:gen       # Gera cliente Prisma
-yarn prisma:dev       # Cria/aplica migrações em dev
-yarn prisma:reset     # Reset completo do banco
-yarn prisma:deploy    # Aplica migrações em produção
-
-# Utilitários
-yarn prisma studio    # Interface visual do banco
-yarn prisma db pull   # Sincroniza schema com banco existente
-```
-
-## 🏗️ Arquitetura
-
-### Padrões Utilizados
-
-#### 1. **Result Pattern**
-
-Sistema de tratamento de erros sem exceptions:
-
-```typescript
-type Result<T, E = string> =
-    | { success: true; data: T }
-    | { success: false; error: E };
-```
-
-#### 2. **Repository Pattern**
-
-Abstração da camada de dados para facilitar testes e manutenção.
-
-#### 3. **Service Layer**
-
-Camada de negócio que contém as regras de negócio da aplicação.
-
-#### 4. **Controller Layer**
-
-Camada de apresentação que lida com requisições HTTP.
-
-## 🏗️ Arquitetura
-
-### Padrões Implementados
-
--   **Result Pattern** - Tratamento funcional de erros sem exceptions
--   **Repository Pattern** - Abstração da camada de dados
--   **Service Layer** - Lógica de negócio centralizada
--   **Controller Layer** - Interface HTTP/REST
--   **Dependency Injection** - Inversão de dependências
--   **Clean Architecture** - Separação clara de responsabilidades
-
-### Fluxo de Dados
-
-```
-HTTP Request → Middleware → Controller → Service → Repository → Database
-                                ↓
-HTTP Response ← Middleware ← Controller ← Service ← Repository ← Database
-```
-
-### Result Pattern Detalhado
-
-**Estrutura do Result:**
+#### **1. Result Pattern**
 
 ```typescript
 type Result<T, E = ApplicationException> =
@@ -320,196 +114,385 @@ type Result<T, E = ApplicationException> =
       };
 ```
 
-**ApplicationErrorEnum - Tipos de Erro Padronizados:**
+-   **Decisão**: Eliminar exceptions para controle de fluxo
+-   **Justificativa**:
+    -   Força tratamento explícito de erros
+    -   Melhora previsibilidade do código
+    -   Facilita debugging e logging
+    -   Type safety para cenários de erro
+-   **Implementação**: Enum para categorização de erros + mensagens padronizadas
+
+#### **2. Repository Pattern**
+
+-   **Decisão**: Abstração da camada de dados
+-   **Justificativa**:
+    -   Facilita testes unitários com mocks
+    -   Permite troca de ORM/banco sem impacto
+    -   Centraliza queries e otimizações
+    -   Interface limpa para services
+
+#### **3. Dependency Injection**
+
+-   **Decisão**: Inversão de dependências manual
+-   **Justificativa**:
+    -   Facilita testes isolados
+    -   Reduz acoplamento entre camadas
+    -   Flexibilidade para diferentes ambientes
+    -   Sem overhead de frameworks complexos
+
+---
+
+## 📂 Organização do Código
+
+### Estrutura Modular
+
+```
+src/
+├── modules/                    # Organização por domínio
+│   ├── users/                 # Módulo completo de usuários
+│   │   ├── user.controller.ts # Interface HTTP
+│   │   ├── user.service.ts    # Lógica de negócio
+│   │   ├── user.repository.ts # Acesso a dados
+│   │   ├── user.routes.ts     # Rotas específicas
+│   │   ├── user.schema.ts     # Validações Zod
+│   │   └── user.model.d.ts    # Tipos TypeScript
+│   ├── articles/              # Módulo de artigos
+│   ├── tags/                  # Módulo de tags
+│   ├── comments/              # Módulo de comentários
+│   ├── auth/                  # Módulo de autenticação
+│   └── articleTags/           # Relacionamento M:N
+├── config/                    # Configurações centralizadas
+├── middlewares/               # Middlewares customizados
+├── types/                     # Tipos globais
+├── utils/                     # Utilitários compartilhados
+└── routes/                    # Agregação de rotas
+```
+
+#### **Organização por Domínio**
+
+-   **Decisão**: Módulos auto-contidos por funcionalidade
+-   **Justificativa**:
+    -   **Alta coesão**: Código relacionado fica junto
+    -   **Baixo acoplamento**: Módulos independentes
+    -   **Facilita evolução**: Adicionar features não impacta outros módulos
+    -   **Team scalability**: Times podem trabalhar em módulos específicos
+
+#### **Convenções de Nomenclatura**
+
+-   **Arquivos**: `entity.layer.ts` (ex: `user.service.ts`)
+-   **Interfaces**: `IEntityAction` (ex: `ICreateUserDTO`)
+-   **Enums**: `EntityEnum` (ex: `ApplicationErrorEnum`)
+-   **Constantes**: `UPPER_SNAKE_CASE`
+
+---
+
+## 🔧 Implementações Específicas
+
+### Sistema de Validação
 
 ```typescript
-enum ApplicationErrorEnum {
-    // Client Errors (4xx)
-    RequiredField = 'REQUIRED_FIELD', // 400 - Campo obrigatório
-    InvalidField = 'INVALID_FIELD', // 400 - Campo inválido
-    ValidationError = 'VALIDATION_ERROR', // 400 - Dados inválidos
-    Unauthorized = 'UNAUTHORIZED', // 401 - Não autorizado
-    Forbidden = 'FORBIDDEN', // 403 - Acesso negado
-    NotFound = 'NOT_FOUND', // 404 - Recurso não encontrado
-    Conflict = 'CONFLICT', // 409 - Conflito de dados
+export const createUserSchema = z.object({
+    name: z.string().min(2).max(100),
+    email: z.string().email(),
+    password: z.string().min(6),
+});
+```
 
-    // Server Errors (5xx)
-    InfrastructureError = 'INFRASTRUCTURE_ERROR', // 500 - Erro interno
-    DatabaseError = 'DATABASE_ERROR', // 500 - Erro no banco
-    ExternalServiceError = 'EXTERNAL_SERVICE_ERROR', // 502 - Erro externo
+#### **Zod para Validação**
+
+-   **Decisão**: Schema validation TypeScript-first
+-   **Justificativa**:
+    -   Inferência automática de tipos
+    -   Validação em runtime e compile time
+    -   Mensagens de erro personalizadas
+    -   Composição e reutilização de schemas
+-   **Implementação**: Schemas específicos por operação (create, update, etc.)
+
+### Tratamento de Erros
+
+```typescript
+export enum ApplicationErrorEnum {
+    RequiredField = 'REQUIRED_FIELD',
+    NotFound = 'NOT_FOUND',
+    Conflict = 'CONFLICT',
+    // ... outros erros categorizados
 }
 ```
 
-**Métodos Disponíveis do Result:**
+#### **Sistema de Erros Padronizado**
 
-```typescript
-// ✅ Sucesso
-Result.success(data, message?, statusCode?)  // Genérico
-Result.ok(data, message?)                    // 200 OK
-Result.created(data, message?)               // 201 Created
+-   **Decisão**: Enum para categorização + mensagens padrão
+-   **Justificativa**:
+    -   Consistência nas respostas da API
+    -   Status codes automáticos por tipo
+    -   Facilita internacionalização
+    -   Previne erros de digitação
+-   **Implementação**: Mapeamento automático erro → status code → mensagem
 
-// ❌ Erro - Nova Sintaxe Simplificada
-Result.error(ApplicationErrorEnum.NotFound)                    // Mensagem padrão
-Result.error(ApplicationErrorEnum.NotFound, 'Custom message')  // Mensagem customizada
-Result.error(ApplicationErrorEnum.ValidationError, ['erro1', 'erro2'])  // Múltiplas mensagens
+### Relacionamentos Complexos
 
-// ❌ Também aceita string/array diretamente
-Result.error('Erro customizado', statusCode?)
-Result.error(['Erro 1', 'Erro 2'], statusCode?)
+```prisma
+model ArticleTag {
+    articleId String
+    tagId     String
+    deletedAt DateTime?
+
+    @@id([articleId, tagId])
+}
 ```
 
-### Exemplo de Uso do Result Pattern
+#### **Many-to-Many com Soft Delete**
+
+-   **Decisão**: Tabela de junção explícita com soft delete
+-   **Justificativa**:
+    -   Controle granular sobre relacionamentos
+    -   Histórico de associações
+    -   Performance em queries complexas
+    -   Flexibilidade para adicionar metadados
+-   **Implementação**: Helpers para sincronização automática de tags
+
+### Logging e Observabilidade
 
 ```typescript
-// Service Layer - Nova Sintaxe
-export const userService = {
-    async create(data: CreateUserDTO): Promise<Result<UserResponseDTO>> {
-        try {
-            const existingUser = await userRepository.findByEmail(data.email);
-
-            // ✅ Nova sintaxe com ApplicationErrorEnum
-            if (existingUser) {
-                return Result.error(
-                    ApplicationErrorEnum.Conflict,
-                    'Usuário já cadastrado com esse email'
-                );
-            }
-
-            const user = await userRepository.create(data);
-            return Result.created(user, 'Usuário criado com sucesso');
-        } catch (error) {
-            // ✅ Uso direto do enum
-            return Result.error(
-                ApplicationErrorEnum.InfrastructureError,
-                'Erro ao criar usuário'
-            );
-        }
+export const logger = {
+    info: (message: string, meta?: any) => {
+        /* structured logging */
     },
-
-    async get(id: string): Promise<Result<UserResponseDTO>> {
-        try {
-            const user = await userRepository.findById({ id });
-
-            // ✅ Sintaxe limpa sem mensagem customizada (usa padrão)
-            if (!user) return Result.error(ApplicationErrorEnum.NotFound);
-
-            return Result.ok(user);
-        } catch {
-            return Result.error(ApplicationErrorEnum.InfrastructureError);
-        }
+    error: (message: string, error?: Error) => {
+        /* error tracking */
     },
-};
-
-// Controller Layer
-export const userController = {
-    async create(req: Request, res: Response) {
-        const validatedData = createUserSchema.parse(req.body);
-        const result = await userService.create(validatedData);
-
-        // Result já vem com statusCode apropriado automaticamente
-        return res.status(result.statusCode).json(result);
-    },
+    // ... outros níveis
 };
 ```
 
-**Vantagens da Nova Implementação:**
+#### **Sistema de Logs Estruturado**
 
--   ✅ **Sintaxe Limpa**: `Result.error(ApplicationErrorEnum.NotFound)`
--   ✅ **Type Safety**: Enum previne erros de digitação
--   ✅ **Consistência**: Status codes automáticos por tipo de erro
--   ✅ **Mensagens Padrão**: Fallback automático para mensagens em português
--   ✅ **Flexibilidade**: Aceita mensagens customizadas e arrays
--   ✅ **Manutenibilidade**: Centralização dos tipos de erro
+-   **Decisão**: Logging estruturado com metadados
+-   **Justificativa**:
+    -   Facilita debugging em produção
+    -   Integração com ferramentas de APM
+    -   Performance tracking
+    -   Auditoria de operações
+-   **Implementação**: Logs por camada + request/response tracking
 
-## 🔧 Funcionalidades Implementadas
+---
 
-### 🔐 Sistema de Autenticação
+## 🔒 Segurança e Performance
 
--   ✅ **Login de usuários** - Validação de credenciais
--   ✅ **Hash de senhas** - Bcrypt com salt configurável
--   ✅ **Validação de dados** - Schemas Zod para entrada
--   🚧 **JWT Tokens** - Geração e validação (em desenvolvimento)
--   🚧 **Middleware de auth** - Proteção de rotas (planejado)
+### Segurança
 
-### 👤 Gerenciamento de Usuários
+-   **Soft Delete**: Preservação de dados para auditoria
+-   **UUIDs**: Identificadores não sequenciais
+-   **Password Hashing**: Bcrypt com salt configurável
+-   **Input Validation**: Sanitização em todas as entradas
+-   **Type Safety**: Prevenção de erros em runtime
 
--   ✅ **CRUD completo** - Create, Read, Update, Delete
--   ✅ **Registro de usuários** - Validação e sanitização
--   ✅ **Soft delete** - Desativação/reativação de contas
--   ✅ **Validação de email** - Prevenção de duplicatas
--   ✅ **Upload de avatar** - Suporte a URLs de imagem
--   ✅ **Paginação** - Lista de usuários paginada
+### Performance
 
-### 🛡️ Segurança e Validação
+-   **Connection Pooling**: Gerenciamento eficiente de conexões
+-   **Selective Queries**: `select` específicos evitam overfetching
+-   **Pagination**: Skip/take para listas grandes
+-   **Indexes**: Automáticos em foreign keys e campos únicos
+-   **Query Optimization**: Prisma queries otimizadas
 
--   ✅ **Result Pattern** - Tratamento funcional de erros
--   ✅ **ApplicationException** - Sistema de erros tipados
--   ✅ **Validação Zod** - Schemas TypeScript-first
--   ✅ **Sanitização** - Remoção de dados sensíveis
--   ✅ **Error Handler** - Middleware global de erros
--   ✅ **Type Safety** - Tipagem estrita TypeScript
+---
 
-### � Observabilidade
+## 🚀 Escalabilidade e Extensibilidade
 
--   ✅ **Logging estruturado** - Sistema de logs customizado
--   ✅ **Request logging** - Middleware de requisições HTTP
--   ✅ **Database logging** - Logs de queries Prisma
--   ✅ **Performance tracking** - Tempo de execução
--   ✅ **Error tracking** - Logs detalhados de erros
+### Preparação para Crescimento
 
-### �️ Banco de Dados
+1. **Modular Architecture**: Fácil adição de novos módulos
+2. **Interface Segregation**: Contratos pequenos e específicos
+3. **Configuration Management**: Centralized env config
+4. **Database Migrations**: Versionamento seguro do schema
+5. **Error Monitoring**: Sistema preparado para APM tools
 
--   ✅ **Prisma ORM** - Type-safe database access
--   ✅ **Migrações** - Versionamento do schema
--   ✅ **Relacionamentos** - Foreign keys e joins
--   ✅ **Soft delete** - Exclusão lógica
--   ✅ **UUID** - Identificadores únicos
--   ✅ **Connection pooling** - Gerenciamento de conexões
+### Facilidade de Manutenção
+
+1. **Clean Code**: Código auto-documentado
+2. **Type Safety**: Refactoring seguro
+3. **Consistent Patterns**: Padrões repetíveis
+4. **Comprehensive Logging**: Debugging facilitado
+5. **Separation of Concerns**: Responsabilidades bem definidas
+
+---
+
+## 🎓 Lições Aprendidas e Trade-offs
+
+### Decisões Bem-Sucedidas
+
+-   **Result Pattern**: Eliminou bugs silenciosos de null/undefined
+-   **Modular Organization**: Facilitou desenvolvimento paralelo
+-   **TypeScript Strict**: Preveniu classes inteiras de bugs
+-   **Prisma**: Acelerou desenvolvimento com type safety
+
+### Trade-offs Aceitos
+
+-   **Verbosidade**: Mais código para maior segurança
+-   **Learning Curve**: Padrões específicos requerem aprendizado
+-   **Over-engineering**: Alguns padrões podem ser overkill para projetos pequenos
+
+### Melhorias Futuras
+
+-   **JWT Authentication**: Sistema de tokens mais robusto
+-   **Caching Layer**: Redis para performance
+-   **Unit Tests**: Cobertura completa de testes
+-   **API Documentation**: OpenAPI/Swagger
+-   **Monitoring**: APM e health checks
+
+---
+
+## 📊 Métricas do Projeto
+
+-   **📁 Linhas de Código**: ~3.000+ linhas TypeScript
+-   **🏗️ Módulos**: 5 módulos principais bem estruturados
+-   **🔒 Type Safety**: 100% TypeScript strict mode
+-   **🧪 Error Handling**: Result Pattern em 100% das operações
+-   **🗃️ Entidades**: 5 entidades com relacionamentos complexos
+-   **⚡ Performance**: Queries otimizadas com selective loading
+
+Este projeto demonstra a aplicação prática de padrões modernos de desenvolvimento, priorizando qualidade, manutenibilidade e escalabilidade em um contexto real de aplicação backend.
+
+---
+
+## 🔗 Tecnologias e Versões
+
+| Tecnologia | Versão | Justificativa                        |
+| ---------- | ------ | ------------------------------------ |
+| Node.js    | 18+    | LTS com performance otimizada        |
+| TypeScript | 5.9    | Latest features + stability          |
+| Express    | 5.1    | Modern version com melhorias         |
+| Prisma     | 6.15   | Type-safe ORM com features avançadas |
+| MySQL      | 8.0+   | Relacionamentos complexos            |
+| Zod        | Latest | Schema validation TypeScript-first   |
+| Bcrypt     | Latest | Hashing seguro de senhas             |
+| TSX        | Latest | Hot reload para desenvolvimento      |
+
+---
+
+## 🛠️ Como Executar o Projeto
+
+### Pré-requisitos
+
+-   Node.js 18+
+-   MySQL 8.0+
+-   Yarn ou NPM
+
+### Instalação
+
+```bash
+# Clone o repositório
+git clone https://github.com/ramon541/back-techblog.git
+cd back-techblog
+
+# Instale dependências
+yarn install
+
+# Configure variáveis de ambiente
+cp .env.example .env
+# Edite o arquivo .env com suas configurações
+
+# Configure o banco de dados
+yarn prisma:dev
+yarn prisma:gen
+
+# Popule com dados de exemplo
+yarn seed
+
+# Inicie o servidor
+yarn dev
+```
+
+### Scripts Disponíveis
+
+```bash
+yarn dev              # Desenvolvimento com hot-reload
+yarn build            # Build para produção
+yarn prisma:gen       # Gera cliente Prisma
+yarn prisma:dev       # Executa migrações
+yarn prisma:reset     # Reset do banco
+yarn seed             # Popula dados de exemplo
+yarn prisma studio    # Interface visual do banco
+```
+
+---
 
 ## 📊 API Endpoints
 
-### Usuários
-
-```http
-POST   /api/users/create     # Criar usuário
-GET    /api/users           # Listar usuários
-GET    /api/users/:id       # Buscar usuário por ID
-PUT    /api/users/:id       # Atualizar usuário
-DELETE /api/users/:id       # Soft delete usuário
-```
-
 ### Autenticação
 
-```http
-POST   /api/auth/login      # Login com email/senha
+-   `POST /api/auth/login` - Login de usuário
+
+### Usuários
+
+-   `GET /api/users` - Listar usuários
+-   `GET /api/users/:id` - Buscar usuário
+-   `POST /api/users` - Criar usuário
+-   `PUT /api/users/:id` - Atualizar usuário
+-   `DELETE /api/users/:id` - Remover usuário
+
+### Artigos
+
+-   `GET /api/articles` - Listar artigos
+-   `GET /api/articles/:id` - Buscar artigo
+-   `POST /api/articles` - Criar artigo
+-   `PUT /api/articles/:id` - Atualizar artigo
+-   `DELETE /api/articles/:id` - Remover artigo
+
+### Tags
+
+-   `GET /api/tags` - Listar tags
+-   `POST /api/tags` - Criar tag
+-   `PUT /api/tags/:id` - Atualizar tag
+-   `DELETE /api/tags/:id` - Remover tag
+
+### Comentários
+
+-   `GET /api/comments` - Listar comentários
+-   `POST /api/comments` - Criar comentário
+-   `PUT /api/comments/:id` - Atualizar comentário
+-   `DELETE /api/comments/:id` - Remover comentário
+
+---
+
+## 💡 Exemplos de Uso
+
+### Login
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email": "admin@email.com", "password": "123456"}'
 ```
 
-### Artigos (planejado)
+### Criar Artigo
 
-```http
-POST   /api/articles        # Criar artigo
-GET    /api/articles        # Listar artigos
-GET    /api/articles/:id    # Buscar artigo por ID
-PUT    /api/articles/:id    # Atualizar artigo
-DELETE /api/articles/:id    # Deletar artigo
+```bash
+curl -X POST http://localhost:3000/api/articles \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "Meu Artigo",
+    "content": "Conteúdo do artigo...",
+    "image": "https://example.com/image.jpg",
+    "authorId": "uuid-do-autor",
+    "tagIds": ["uuid-tag1", "uuid-tag2"]
+  }'
 ```
 
-### Respostas Padronizadas
-
-**Sucesso:**
+### Resposta de Sucesso
 
 ```json
 {
     "success": true,
     "data": {
-        /* objeto retornado */
+        /* dados retornados */
     },
     "message": "Operação realizada com sucesso",
     "statusCode": 200
 }
 ```
 
-**Erro:**
+### Resposta de Erro
 
 ```json
 {
@@ -520,141 +503,111 @@ DELETE /api/articles/:id    # Deletar artigo
 }
 ```
 
-## 🚧 Roadmap
+---
 
-### ✅ Recentemente Implementado
+## 🔍 Modelo de Dados
 
--   **🔐 Sistema de Login** - Autenticação com email/senha completa
--   **📝 Auth Controller** - Endpoint `/api/auth/login` funcional
--   **🛠️ Result Pattern Aprimorado** - Sintaxe `Result.error(ApplicationErrorEnum.NotFound)`
--   **🔧 Error Handler** - Integração com ApplicationErrorEnum
--   **📋 Auth Schemas** - Validação Zod para credenciais de login
--   **🏗️ Auth Service** - Validação de credenciais e status de conta
+### Entidades Principais
 
-### Funcionalidades Planejadas
+```prisma
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  avatar    String?
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-#### 📝 Sistema de Artigos
+  articles  Article[]
+  comments  Comment[]
+  @@map("users")
+}
 
--   [ ] **CRUD de Artigos** - Criar, ler, atualizar, deletar
--   [ ] **Editor Markdown** - Suporte completo a markdown
--   [ ] **Upload de Imagens** - Gerenciamento de mídia
--   [ ] **Slug URLs** - URLs amigáveis para SEO
--   [ ] **Versioning** - Histórico de edições
+model Article {
+  id        String    @id @default(uuid())
+  title     String
+  content   String    @db.Text
+  image     String?
+  authorId  String    @map("author_id")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-#### 🏷️ Sistema de Tags
+  author   User         @relation(fields: [authorId], references: [id])
+  tags     ArticleTag[]
+  comments Comment[]
+  @@map("articles")
+}
 
--   [ ] **Gerenciamento de Tags** - CRUD completo
--   [ ] **Tag Suggestions** - Sugestões automáticas
--   [ ] **Popular Tags** - Rankings e estatísticas
--   [ ] **Tag Filtering** - Filtros avançados
+model Tag {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-#### 💬 Sistema de Comentários
+  articles ArticleTag[]
+  @@map("tags")
+}
 
--   [ ] **Comentários Aninhados** - Threads de discussão
--   [ ] **Moderação** - Sistema de aprovação
--   [ ] **Markdown Support** - Formatação nos comentários
--   [ ] **Notifications** - Notificações de respostas
+model ArticleTag {
+  articleId String    @map("article_id")
+  tagId     String    @map("tag_id")
+  deletedAt DateTime? @map("deleted_at")
 
-#### 🔍 Busca e Filtros
+  article Article @relation(fields: [articleId], references: [id])
+  tag     Tag     @relation(fields: [tagId], references: [id])
 
--   [ ] **Full-text Search** - Busca avançada
--   [ ] **Elasticsearch** - Engine de busca robusta
--   [ ] **Filters & Sorting** - Múltiplos critérios
--   [ ] **Search Analytics** - Métricas de busca
+  @@id([articleId, tagId])
+  @@map("article_tags")
+}
 
-#### 📊 Analytics e Métricas
+model Comment {
+  id        String    @id @default(uuid())
+  content   String    @db.Text
+  articleId String    @map("article_id")
+  userId    String    @map("user_id")
+  parentId  String?   @map("parent_id")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
 
--   [ ] **View Tracking** - Contagem de visualizações
--   [ ] **User Analytics** - Métricas de usuário
--   [ ] **Performance Monitoring** - APM integration
--   [ ] **Admin Dashboard** - Painel administrativo
+  article Article   @relation(fields: [articleId], references: [id])
+  user    User      @relation(fields: [userId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
 
-#### 🚀 Performance e Escala
-
--   [ ] **Caching** - Redis para cache
--   [ ] **CDN Integration** - Distribuição de conteúdo
--   [ ] **Database Optimization** - Índices e queries
--   [ ] **Load Balancing** - Distribuição de carga
-
-#### 🧪 Qualidade e Testes
-
--   [ ] **Unit Tests** - Testes unitários (Jest)
--   [ ] **Integration Tests** - Testes de integração
--   [ ] **E2E Tests** - Testes end-to-end
--   [ ] **API Documentation** - Swagger/OpenAPI
--   [ ] **Code Coverage** - Cobertura de testes
-
-#### 📱 Integrações
-
--   [ ] **Email Service** - SendGrid/Nodemailer
--   [ ] **File Storage** - AWS S3/Cloudinary
--   [ ] **Monitoring** - Sentry/DataDog
--   [ ] **CI/CD** - GitHub Actions
--   [ ] **Docker** - Containerização
-
-### Padrões de Commit
-
-Utilizamos [Conventional Commits](https://conventionalcommits.org/):
-
-```bash
-:sparkles: feat: nova funcionalidade
-:bug: fix: correção de bug
-:recycle: refactor: refatoração de código
-:memo: docs: documentação
-:white_check_mark: test: testes
-:art: style: formatação
-:zap: perf: performance
+  @@map("comments")
+}
 ```
-
-## � Licença
-
-Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-### MIT License
-
-```
-Copyright (c) 2025 Ramon Monteiro
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-[...full license text...]
-```
-
-## 🙏 Agradecimentos
-
--   **Prisma Team** - Pelo excelente ORM
--   **Express.js** - Framework web robusto
--   **TypeScript** - Type safety incrível
--   **Zod** - Validação de dados elegante
--   **Bcrypt** - Segurança em passwords
-
-## �👨‍💻 Autor
-
-<div align="center">
-
-**Ramon Monteiro**
-
-[![GitHub](https://img.shields.io/badge/GitHub-ramon541-black?style=for-the-badge&logo=github)](https://github.com/ramon541)
-[![Email](https://img.shields.io/badge/Email-ramondiasmonteiro@gmail.com-red?style=for-the-badge&logo=gmail)](mailto:ramondiasmonteiro@gmail.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/ramondiasmonteiro)
-
-</div>
 
 ---
 
-<div align="center">
+## 🤝 Contribuindo
 
-**⭐ Se este projeto te ajudou, considere dar uma estrela!**
+1. Fork o projeto
+2. Crie uma branch: `git checkout -b feature/nova-funcionalidade`
+3. Commit: `git commit -m 'feat: adiciona nova funcionalidade'`
+4. Push: `git push origin feature/nova-funcionalidade`
+5. Abra um Pull Request
 
-![GitHub Stars](https://img.shields.io/github/stars/ramon541/back-techblog?style=social)
-![GitHub Forks](https://img.shields.io/github/forks/ramon541/back-techblog?style=social)
-![GitHub Issues](https://img.shields.io/github/issues/ramon541/back-techblog?style=social)
+### Convenções
 
-**🚀 Built with ❤️ and TypeScript**
+-   Use Conventional Commits
+-   Mantenha TypeScript strict mode
+-   Siga os padrões Result Pattern
+-   Adicione testes para novas funcionalidades
 
-</div>
+---
+
+## 👨‍💻 Autor
+
+**Ramon Monteiro** - Desenvolvedor focado em arquitetura de software, clean code e boas práticas de desenvolvimento.
+
+[![GitHub](https://img.shields.io/badge/GitHub-ramon541-black?style=for-the-badge&logo=github)](https://github.com/ramon541)
+[![Email](https://img.shields.io/badge/Email-ramondiasmonteiro@gmail.com-red?style=for-the-badge&logo=gmail)](mailto:ramondiasmonteiro@gmail.com)
+
+---
+
+_Esta documentação reflete as decisões técnicas e arquiteturais tomadas durante o desenvolvimento, servindo como referência para futuras evoluções do projeto._

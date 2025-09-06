@@ -1,5 +1,4 @@
 import type { Request, Response, NextFunction } from 'express';
-import { StatusCodes } from 'http-status-codes';
 import { ZodError } from 'zod';
 import { ApplicationErrorEnum, Result } from '../utils/result.js';
 import logger from '../utils/logger.js';
@@ -27,11 +26,11 @@ async function errorHandler(
     }
 
     const message = err instanceof Error ? err.message : 'Erro desconhecido';
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: `Erro interno do servidor: ${message}`,
-        data: null,
-    });
+    const genericError = Result.error(
+        ApplicationErrorEnum.InfrastructureError,
+        `Erro interno do servidor: ${message}`
+    );
+    res.status(genericError.statusCode).json(genericError);
     return;
 }
 

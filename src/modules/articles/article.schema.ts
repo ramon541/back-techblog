@@ -41,6 +41,7 @@ export const createArticleSchema = z.object({
             MAX_CONTENT_LENGTH,
             `Conteúdo deve ter no máximo ${MAX_CONTENT_LENGTH} caracteres`
         ),
+    image: z.url('URL da imagem deve ser válida').optional(),
     authorId: z.uuid('ID do autor deve ser um UUID válido'),
     tagIds: z
         .array(z.uuid('ID da tag deve ser um UUID válido'))
@@ -84,6 +85,7 @@ export const updateArticleSchema = z.object({
             `Conteúdo deve ter no máximo ${MAX_CONTENT_LENGTH} caracteres`
         )
         .optional(),
+    image: z.url('URL da imagem deve ser válida').optional(),
     tagIds: z
         .array(z.uuid('ID da tag deve ser um UUID válido'))
         .min(

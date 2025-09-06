@@ -10,6 +10,7 @@ interface IArticle {
     id: string;
     title: string;
     content: string;
+    image: string | null;
     authorId: string;
     deletedAt: Date | null;
     createdAt: Date;
@@ -27,7 +28,7 @@ interface ICreateArticleDTO
 
 interface IUpdateArticleDTO
     extends Pick<IArticle, 'id'>,
-        Partial<Pick<IArticle, 'title' | 'content'>> {
+        Partial<Pick<IArticle, 'title' | 'content' | 'image'>> {
     tagIds?: Array<string>;
 }
 
