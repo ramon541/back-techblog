@@ -8,7 +8,7 @@
 import { z } from 'zod';
 
 const MIN_NAME_LENGTH = 2;
-const MAX_NAME_LENGTH = 12;
+const MAX_NAME_LENGTH = 20;
 
 //= =================================================================================
 export const createTagSchema = z.object({

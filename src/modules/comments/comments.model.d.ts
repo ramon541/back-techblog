@@ -11,32 +11,17 @@ interface IComment {
     content: string;
     articleId: string;
     userId: string;
-    parentId?: string;
+    parentId?: string | null;
     deletedAt: Date | null;
     createdAt: Date;
-
-    // Relations
-    article?: IArticle;
-    user?: IUser;
-    parent?: IComment;
-    replies?: IComment[];
 }
 
 // DTOs (Data Transfer Objects)
 interface ICreateCommentDTO
-    extends Omit<
-        IComment,
-        | 'id'
-        | 'createdAt'
-        | 'deletedAt'
-        | 'article'
-        | 'user'
-        | 'parent'
-        | 'replies'
-    > {}
+    extends Omit<IComment, 'id' | 'createdAt' | 'deletedAt' | 'article'> {}
 
-interface IUpdateCommentDTO
-    extends Pick<IComment, 'id'>,
-        Partial<Pick<IComment, 'content' | 'parentId'>> {}
+interface IUpdateCommentDTO extends Pick<IComment, 'id' | 'content'> {}
 
 interface ICommentResponseDTO extends Omit<IComment, 'deletedAt'> {}
+
+interface IGetRepliesDTO extends Pick<IComment, 'id'>, ISearchWithPagination {}

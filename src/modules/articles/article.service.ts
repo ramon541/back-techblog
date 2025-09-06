@@ -15,20 +15,69 @@
  * - Flexible search and filtering logic
  */
 import { ApplicationErrorEnum, Result } from '../../utils/result.js';
+import { articleTagService } from '../articleTags/articleTag.service.js';
+import { userRepository } from '../users/user.repository.js';
 import { articleRepository } from './article.repository.js';
 
 export const articleService = {
-    create: async (
-        data: ICreateArticleDTO
-    ): Promise<Result<IArticleResponseDTO, string>> => {
+    create: async ({
+        authorId,
+        content,
+        tagIds,
+        title,
+    }: ICreateArticleDTO): Promise<Result<IArticleResponseDTO, string>> => {
         try {
-            const article = await articleRepository.create(data);
+            const author = await userRepository.findById({ id: authorId });
+            if (!author)
+                return Result.error(
+                    ApplicationErrorEnum.NotFound,
+                    'Autor não encontrado'
+                );
 
-            return Result.created(article, 'Artigo registrado com sucesso');
+            if (tagIds && tagIds.length > 3) {
+                return Result.error(
+                    ApplicationErrorEnum.InvalidField,
+                    'Um artigo pode ter no máximo 3 tags'
+                );
+            }
+
+            const article = await articleRepository.create({
+                authorId,
+                content,
+                title,
+            });
+
+            if (tagIds && tagIds.length > 0) {
+                const syncResult = await articleTagService.syncArticleTags({
+                    articleId: article.id,
+                    tagIds,
+                });
+                if (!syncResult.success) {
+                    await articleRepository.softDelete({ id: article.id });
+                    return syncResult;
+                }
+            }
+
+            return Result.created(article, 'Artigo criado com sucesso');
         } catch {
             return Result.error(
                 ApplicationErrorEnum.InfrastructureError,
                 'Erro ao registrar artigo'
+            );
+        }
+    },
+
+    //= =================================================================================
+    search: async (
+        data: IArticleSearchDTO
+    ): Promise<Result<IArticleResponseDTO[], string>> => {
+        try {
+            const articles = await articleRepository.findByTerm(data);
+            return Result.ok(articles, 'Artigos encontrados com sucesso');
+        } catch {
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao buscar artigos'
             );
         }
     },
@@ -69,8 +118,9 @@ export const articleService = {
     //= =================================================================================
     update: async ({
         id,
+        tagIds,
         ...rest
-    }: IUpdateUserDTO): Promise<Result<IArticleResponseDTO, string>> => {
+    }: IUpdateArticleDTO): Promise<Result<IArticleResponseDTO, string>> => {
         try {
             const article = await articleRepository.findById({ id });
             if (!article)
@@ -79,10 +129,33 @@ export const articleService = {
                     'Artigo não encontrado'
                 );
 
+            if (tagIds && tagIds.length > 3) {
+                return Result.error(
+                    ApplicationErrorEnum.InvalidField,
+                    'Um artigo pode ter no máximo 3 tags'
+                );
+            }
+            if (tagIds && tagIds.length > 3) {
+                return Result.error(
+                    ApplicationErrorEnum.InvalidField,
+                    'Um artigo pode ter no máximo 3 tags'
+                );
+            }
+
             const updatedArticle = await articleRepository.update({
                 id,
                 ...rest,
             });
+
+            if (tagIds) {
+                const syncResult = await articleTagService.syncArticleTags({
+                    articleId: id,
+                    tagIds,
+                });
+                if (!syncResult.success) {
+                    return syncResult;
+                }
+            }
 
             return Result.ok(updatedArticle, 'Artigo atualizado com sucesso');
         } catch {

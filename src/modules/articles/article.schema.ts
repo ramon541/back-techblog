@@ -1,17 +1,23 @@
 /**
- * User Validation Schemas
+ * Article Validation Schemas
  *
- * This file contains Zod validation schemas for User-related operations.
+ * This file contains Zod validation schemas for Article-related operations.
  * These schemas are used for request validation in controllers and middleware,
  * ensuring data integrity and type safety at the API boundary.
  */
 import { z } from 'zod';
+import { paginationSchema } from '../../common/schemas/pagination.schema.js';
 
 const MIN_TITLE_LENGTH = 3;
 const MAX_TITLE_LENGTH = 100;
 
 const MIN_CONTENT_LENGTH = 10;
 const MAX_CONTENT_LENGTH = 5000;
+
+const MAX_TERM_LENGTH = 16;
+
+const MIN_TAGS_PER_ARTICLE = 1;
+const MAX_TAGS_PER_ARTICLE = 3;
 
 //= =================================================================================
 export const createArticleSchema = z.object({
@@ -36,7 +42,16 @@ export const createArticleSchema = z.object({
             `Conteúdo deve ter no máximo ${MAX_CONTENT_LENGTH} caracteres`
         ),
     authorId: z.uuid('ID do autor deve ser um UUID válido'),
-    tagId: z.uuid('ID da tag deve ser um UUID válido'),
+    tagIds: z
+        .array(z.uuid('ID da tag deve ser um UUID válido'))
+        .min(
+            MIN_TAGS_PER_ARTICLE,
+            `Um artigo deve ter no mínimo ${MIN_TAGS_PER_ARTICLE} tags`
+        )
+        .max(
+            MAX_TAGS_PER_ARTICLE,
+            `Um artigo pode ter no máximo ${MAX_TAGS_PER_ARTICLE} tags`
+        ),
 });
 
 //= =================================================================================
@@ -69,5 +84,25 @@ export const updateArticleSchema = z.object({
             `Conteúdo deve ter no máximo ${MAX_CONTENT_LENGTH} caracteres`
         )
         .optional(),
-    tagId: z.uuid('ID da tag deve ser um UUID válido').optional(),
+    tagIds: z
+        .array(z.uuid('ID da tag deve ser um UUID válido'))
+        .min(
+            MIN_TAGS_PER_ARTICLE,
+            `Um artigo deve ter no mínimo ${MIN_TAGS_PER_ARTICLE} tags`
+        )
+        .max(
+            MAX_TAGS_PER_ARTICLE,
+            `Um artigo pode ter no máximo ${MAX_TAGS_PER_ARTICLE} tags`
+        )
+        .optional(),
+});
+
+//= =================================================================================
+export const searchArticleSchema = paginationSchema.extend({
+    term: z
+        .string('Termo de busca é obrigatório')
+        .max(
+            MAX_TERM_LENGTH,
+            `A busca deve ter no máximo ${MAX_TERM_LENGTH} caracteres`
+        ),
 });

@@ -11,7 +11,6 @@ interface IArticle {
     title: string;
     content: string;
     authorId: string;
-    tagId: string;
     deletedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
@@ -22,11 +21,15 @@ interface ICreateArticleDTO
     extends Omit<
         IArticle,
         'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'comments'
-    > {}
+    > {
+    tagIds: Array<string>;
+}
 
 interface IUpdateArticleDTO
     extends Pick<IArticle, 'id'>,
-        Partial<Pick<IArticle, 'title' | 'content' | 'authorId' | 'tagId'>> {}
+        Partial<Pick<IArticle, 'title' | 'content'>> {
+    tagIds?: Array<string>;
+}
 
 interface IArticleResponseDTO extends Omit<IArticle, 'deletedAt'> {}
 

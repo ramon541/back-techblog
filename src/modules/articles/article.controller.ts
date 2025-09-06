@@ -18,13 +18,17 @@ import { articleService } from './article.service.js';
 import {
     createArticleSchema,
     getArticleSchema,
+    searchArticleSchema,
     updateArticleSchema,
 } from './article.schema.js';
 import logger from '../../utils/logger.js';
+import { paginationSchema } from '../../common/schemas/pagination.schema.js';
 
 const articleLogger = logger.createModuleLogger('ARTICLE');
 
-export type IApiArticleController = IApiControllerBase<RequestHandler>;
+export type IApiArticleController = IApiControllerBase<RequestHandler> & {
+    search: RequestHandler;
+};
 
 export const articleController: IApiArticleController = {
     create: async (req, res, next) => {
@@ -40,6 +44,36 @@ export const articleController: IApiArticleController = {
                     id: result.data.id,
                 });
             else articleLogger.warn('Article creation failed', result);
+
+            res.status(result.statusCode).json(result);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    //= =================================================================================
+    search: async (req, res, next) => {
+        try {
+            articleLogger.info('Starting article search');
+
+            const page = req.query.page ? Number(req.query.page) : 1;
+            const limit = req.query.limit ? Number(req.query.limit) : 10;
+            const term = req.query.term ? String(req.query.term) : '';
+
+            const validatedData = searchArticleSchema.parse({
+                page,
+                limit,
+                term,
+            });
+
+            const result = await articleService.search(validatedData);
+
+            if (result.success)
+                articleLogger.success('Article search completed successfully', {
+                    count: result.data.length,
+                });
+            else articleLogger.warn('Article search failed', result);
 
             res.status(result.statusCode).json(result);
             return;
@@ -76,10 +110,12 @@ export const articleController: IApiArticleController = {
         try {
             articleLogger.info('Starting articles retrieval');
 
-            const page = Number(req.query.page) || 1;
-            const limit = Number(req.query.limit) || 10;
+            const page = req.query.page ? Number(req.query.page) : 1;
+            const limit = req.query.limit ? Number(req.query.limit) : 10;
 
-            const result = await articleService.getAll({ page, limit });
+            const validatedData = paginationSchema.parse({ page, limit });
+
+            const result = await articleService.getAll(validatedData);
 
             if (result.success)
                 articleLogger.success('Articles retrieved successfully', {

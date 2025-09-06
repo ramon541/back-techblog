@@ -1,76 +1,67 @@
 /**
- * Article Repository
+ * Comment Repository
  *
- * This file contains all database operations related to Article entity.
+ * This file contains all database operations related to Comment entity.
  * It serves as the data access layer, providing a clean interface between
  * the business logic and the database using Prisma ORM.
  *
  * Responsibilities:
- * - CRUD operations for Article entity
+ * - CRUD operations for Comment entity
  * - Query optimization and database interactions
  * - Data persistence and retrieval
  * - Soft delete implementation
  */
 import prisma from '../../config/database.js';
 
-export const articleRepository = {
-    create: async (
-        data: Omit<ICreateArticleDTO, 'tagIds'>
-    ): Promise<IArticle> => {
-        return prisma.article.create({ data });
-    },
-
-    //= =================================================================================
-    findByTerm: async ({
-        term,
-        page = 1,
-        limit = 10,
-    }: IArticleSearchDTO): Promise<IArticle[]> => {
-        return prisma.article.findMany({
-            where: {
-                deletedAt: null,
-                OR: [
-                    { title: { contains: term } },
-                    { author: { name: { contains: term } } },
-                ],
-            },
-            include: {
-                author: true,
-            },
-            skip: (page - 1) * limit,
-            take: limit,
-        });
+export const commentRepository = {
+    create: async (data: ICreateCommentDTO): Promise<IComment> => {
+        return prisma.comment.create({ data });
     },
 
     //= =================================================================================
     findAll: async ({
         page = 1,
         limit = 10,
-    }: ISearchWithPagination): Promise<Array<IArticle>> => {
-        return prisma.article.findMany({
+    }: ISearchWithPagination): Promise<Array<IComment>> => {
+        return prisma.comment.findMany({
+            where: { parentId: null },
             skip: (page - 1) * limit,
             take: limit,
+            orderBy: { createdAt: 'desc' },
+        });
+    },
+    //= =================================================================================
+    findReplies: async (
+        commentId: string,
+        page: number = 1,
+        limit: number = 5
+    ): Promise<IComment[]> => {
+        return prisma.comment.findMany({
+            where: { parentId: commentId },
+            skip: (page - 1) * limit,
+            take: limit,
+            orderBy: { createdAt: 'asc' },
         });
     },
 
     //= =================================================================================
-    findById: async (id: Pick<IArticle, 'id'>): Promise<IArticle | null> => {
-        return prisma.article.findUnique({
+    findById: async (id: Pick<IComment, 'id'>): Promise<IComment | null> => {
+        return prisma.comment.findUnique({
             where: id,
         });
     },
 
     //= =================================================================================
-    update: async ({ id, ...data }: IUpdateArticleDTO): Promise<IArticle> => {
-        return prisma.article.update({
+    update: async ({ id, ...data }: IUpdateCommentDTO): Promise<IComment> => {
+        return prisma.comment.update({
             where: { id },
             data,
         });
     },
 
     //= =================================================================================
-    softDelete: async (id: Pick<IArticle, 'id'>): Promise<IArticle> => {
-        return prisma.article.update({
+    softDelete: async (id: Pick<IComment, 'id'>): Promise<IComment> => {
+        return prisma.comment.update({
             where: id,
             data: { deletedAt: new Date() },
         });
@@ -78,9 +69,9 @@ export const articleRepository = {
 
     //= =================================================================================
     count: async (): Promise<number> => {
-        return prisma.article.count();
+        return prisma.comment.count();
     },
 };
 
 //= =================================================================================
-export type ArticleRepository = typeof articleRepository;
+export type CommentRepository = typeof commentRepository;
