@@ -25,6 +25,7 @@ export const articleService = {
         content,
         tagIds,
         title,
+        image,
     }: ICreateArticleDTO): Promise<Result<IArticleResponseDTO, string>> => {
         try {
             const author = await userRepository.findById({ id: authorId });
@@ -45,6 +46,7 @@ export const articleService = {
                 authorId,
                 content,
                 title,
+                image,
             });
 
             if (tagIds && tagIds.length > 0) {

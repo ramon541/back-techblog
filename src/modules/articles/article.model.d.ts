@@ -10,7 +10,7 @@ interface IArticle {
     id: string;
     title: string;
     content: string;
-    image: string | null;
+    image?: string | null;
     authorId: string;
     deletedAt: Date | null;
     createdAt: Date;
@@ -19,10 +19,7 @@ interface IArticle {
 
 // DTOs (Data Transfer Objects)
 interface ICreateArticleDTO
-    extends Omit<
-        IArticle,
-        'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'comments'
-    > {
+    extends Omit<IArticle, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
     tagIds: Array<string>;
 }
 

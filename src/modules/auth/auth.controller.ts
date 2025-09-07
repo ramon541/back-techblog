@@ -1,7 +1,7 @@
 /**
- * User Controller Layer
+ * Auth Controller Layer
  *
- * This file contains HTTP request handlers for User-related operations.
+ * This file contains HTTP request handlers for Auth-related operations.
  * It serves as the interface between HTTP requests and the business logic layer,
  * handling request validation, response formatting, and error handling.
  *
@@ -10,7 +10,7 @@
  * - Request data validation using Zod schemas
  * - Response formatting and status code management
  * - Error handling and HTTP error responses
- * - Coordination with user service layer
+ * - Coordination with auth service layer
  * - Authentication and authorization checks
  */
 import type { RequestHandler } from 'express';
