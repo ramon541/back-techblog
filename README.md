@@ -1,18 +1,39 @@
-# 🏗️ TechBlog Backend - Documentação Técnica
+# 🏗️ TechBlog Backend - API RESTful Completa
 
-## 📋 Concepção do Projeto
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-5.1-black?style=for-the-badge&logo=express)](https://expressjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.15-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-### Visão Geral
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
 
-O **TechBlog Backend** foi concebido como uma API RESTful robusta para gerenciar um blog de tecnologia, priorizando **escalabilidade**, **manutenibilidade** e **qualidade de código**. O projeto foi arquitetado seguindo princípios de **Clean Architecture** e padrões modernos de desenvolvimento, com foco na experiência do desenvolvedor e na facilidade de evolução do sistema.
+> **API RESTful completa para blog de tecnologia com arquitetura limpa, comentários hierárquicos, busca avançada e sistema de paginação inteligente.**
 
-### Objetivos do Projeto
+## 📋 Sobre o Projeto
 
-1. **Demonstrar Best Practices** - Implementar padrões de arquitetura e código de alta qualidade
-2. **Escalabilidade** - Estrutura preparada para crescimento e novas funcionalidades
-3. **Manutenibilidade** - Código limpo, bem documentado e fácil de modificar
-4. **Type Safety** - Aproveitamento máximo do TypeScript para prevenir erros
-5. **Observabilidade** - Sistema de logs e monitoramento para ambiente de produção
+O **TechBlog Backend** é uma API RESTful robusta e completa para gerenciar um blog de tecnologia, desenvolvida com foco em **escalabilidade**, **manutenibilidade** e **qualidade de código**. O projeto implementa **Clean Architecture**, padrões modernos de desenvolvimento e features avançadas como sistema de comentários hierárquicos, busca com filtros, paginação inteligente e upload de imagens.
+
+### ✨ Funcionalidades Principais
+
+-   📝 **Gestão de Artigos** - Criação e busca avançada com suporte a imagens
+-   🏷️ **Sistema de Tags** - Organização por categorias com relacionamento M:N otimizado
+-   💬 **Comentários Hierárquicos** - Sistema completo com respostas aninhadas
+-   🔍 **Busca Avançada** - Filtros combinados por termo, tag e paginação inteligente
+-   🌐 **CORS Configurado** - Pronto para integração com qualquer frontend
+-   📊 **Paginação Inteligente** - Metadata completa (hasNext, hasPrev, totalPages)
+-   🖼️ **Suporte a Imagens** - URLs validadas para artigos e avatares de usuários
+-   🔒 **Soft Delete** - Exclusão lógica preservando integridade referencial
+-   📋 **Logging Estruturado** - Sistema modular com diferentes níveis por contexto
+
+### 🎯 Objetivos do Projeto
+
+1. **Demonstrar Best Practices** - Arquitetura limpa e padrões de qualidade
+2. **Escalabilidade** - Estrutura preparada para crescimento
+3. **Manutenibilidade** - Código limpo, tipado e bem documentado
+4. **Type Safety** - 100% TypeScript com validação robusta
+5. **Developer Experience** - Hot reload, logging e debugging otimizados
 
 ---
 
@@ -317,31 +338,6 @@ export const logger = {
 
 ---
 
-## 🎓 Lições Aprendidas e Trade-offs
-
-### Decisões Bem-Sucedidas
-
--   **Result Pattern**: Eliminou bugs silenciosos de null/undefined
--   **Modular Organization**: Facilitou desenvolvimento paralelo
--   **TypeScript Strict**: Preveniu classes inteiras de bugs
--   **Prisma**: Acelerou desenvolvimento com type safety
-
-### Trade-offs Aceitos
-
--   **Verbosidade**: Mais código para maior segurança
--   **Learning Curve**: Padrões específicos requerem aprendizado
--   **Over-engineering**: Alguns padrões podem ser overkill para projetos pequenos
-
-### Melhorias Futuras
-
--   **JWT Authentication**: Sistema de tokens mais robusto
--   **Caching Layer**: Redis para performance
--   **Unit Tests**: Cobertura completa de testes
--   **API Documentation**: OpenAPI/Swagger
--   **Monitoring**: APM e health checks
-
----
-
 ## 📊 Métricas do Projeto
 
 -   **📁 Linhas de Código**: ~3.000+ linhas TypeScript
@@ -355,150 +351,376 @@ Este projeto demonstra a aplicação prática de padrões modernos de desenvolvi
 
 ---
 
-## 🔗 Tecnologias e Versões
+## 🔗 Stack Tecnológica
 
-| Tecnologia | Versão | Justificativa                        |
-| ---------- | ------ | ------------------------------------ |
-| Node.js    | 18+    | LTS com performance otimizada        |
-| TypeScript | 5.9    | Latest features + stability          |
-| Express    | 5.1    | Modern version com melhorias         |
-| Prisma     | 6.15   | Type-safe ORM com features avançadas |
-| MySQL      | 8.0+   | Relacionamentos complexos            |
-| Zod        | Latest | Schema validation TypeScript-first   |
-| Bcrypt     | Latest | Hashing seguro de senhas             |
-| TSX        | Latest | Hot reload para desenvolvimento      |
+| Tecnologia     | Versão | Uso                 | Justificativa                      |
+| -------------- | ------ | ------------------- | ---------------------------------- |
+| **Node.js**    | 18+    | Runtime JavaScript  | LTS com performance otimizada      |
+| **TypeScript** | 5.9    | Linguagem principal | Type safety + DX superior          |
+| **Express.js** | 5.1    | Framework web       | Flexibilidade + ecosystem maduro   |
+| **Prisma**     | 6.15   | ORM + Client        | Type-safe + migrations automáticas |
+| **MySQL**      | 8.0+   | Banco de dados      | ACID + relacionamentos complexos   |
+| **Zod**        | Latest | Validação de schema | TypeScript-first validation        |
+| **Bcrypt**     | 6.0    | Hash de senhas      | Segurança comprovada               |
+| **CORS**       | 2.8.5  | Cross-origin        | Integração frontend                |
+| **TSX**        | 4.20.5 | Hot reload dev      | DX otimizada                       |
+
+### 🔧 Dependências por Categoria
+
+#### **Produção**
+
+-   `@prisma/client` - Cliente gerado automaticamente
+-   `prisma` - CLI e runtime
+-   `express` - Framework web minimalista
+-   `cors` - Middleware cross-origin
+-   `bcrypt` - Hash seguro de senhas
+-   `zod` - Validação TypeScript-first
+
+#### **Desenvolvimento**
+
+-   `typescript` - Compilador TS
+-   `tsx` - TypeScript executor + hot reload
+-   `@types/*` - Definições de tipos para JavaScript libs
+
+### 📦 Scripts Npm Disponíveis
+
+```bash
+# Desenvolvimento
+yarn dev              # Servidor com hot-reload (tsx watch)
+yarn build            # Build TypeScript para produção
+
+# Database
+yarn prisma:gen       # Gerar cliente Prisma
+yarn prisma:dev       # Aplicar migrations em desenvolvimento
+yarn prisma:reset     # Reset completo do banco
+yarn prisma:deploy    # Deploy migrations em produção
+yarn seed             # Popular banco com dados de exemplo
+
+# Pós-instalação
+yarn postinstall      # Auto-executa prisma:dev + prisma:gen
+```
 
 ---
 
 ## 🛠️ Como Executar o Projeto
 
-### Pré-requisitos
+### 📋 Pré-requisitos
 
--   Node.js 18+
--   MySQL 8.0+
--   Yarn ou NPM
+-   **Node.js** 18+ (LTS recomendado)
+-   **MySQL** 8.0+ ou **Docker** para containerização
+-   **Yarn** (recomendado) ou **NPM**
+-   **Git** para clonagem do repositório
 
-### Instalação
+### 🚀 Instalação Rápida
 
 ```bash
-# Clone o repositório
+# 1. Clone o repositório
 git clone https://github.com/ramon541/back-techblog.git
 cd back-techblog
 
-# Instale dependências
+# 2. Instale as dependências
 yarn install
+# O postinstall irá executar automaticamente:
+# - yarn prisma:dev (migrações)
+# - yarn prisma:gen (geração do cliente)
 
-# Configure variáveis de ambiente
+# 3. Configure as variáveis de ambiente
 cp .env.example .env
 # Edite o arquivo .env com suas configurações
 
-# Configure o banco de dados
-yarn prisma:dev
-yarn prisma:gen
-
-# Popule com dados de exemplo
+# 4. (Opcional) Popule com dados de exemplo
 yarn seed
 
-# Inicie o servidor
+# 5. Inicie o servidor de desenvolvimento
 yarn dev
 ```
 
-### Scripts Disponíveis
+### 🔧 Configuração Manual (Alternativa)
+
+Se preferir executar passo a passo:
 
 ```bash
-yarn dev              # Desenvolvimento com hot-reload
-yarn build            # Build para produção
-yarn prisma:gen       # Gera cliente Prisma
-yarn prisma:dev       # Executa migrações
-yarn prisma:reset     # Reset do banco
-yarn seed             # Popula dados de exemplo
-yarn prisma studio    # Interface visual do banco
+# Após instalar dependências:
+yarn prisma:dev       # Aplicar migrações
+yarn prisma:gen       # Gerar cliente Prisma
+yarn seed             # Popular com dados de exemplo
+yarn dev              # Iniciar servidor
+```
+
+### 🌍 Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto:
+
+```env
+# Banco de Dados
+DATABASE_URL="mysql://usuario:senha@localhost:3306/techblog"
+
+# Servidor
+PORT=3000
+
+# Segurança
+BCRYPT_SALT_ROUNDS=12
+```
+
+### ✅ Verificação da Instalação
+
+Após executar `yarn dev`, você deve ver:
+
+```
+2025-09-08 12:00:00 [ENV] ✅ SUCCESS: All environment variables loaded successfully
+2025-09-08 12:00:00 [SERVER] ✅ SUCCESS: Middlewares loaded successfully
+2025-09-08 12:00:00 [SERVER] ✅ SUCCESS: Server running on http://localhost:3000
+2025-09-08 12:00:00 [DATABASE] ✅ SUCCESS: Database connected successfully
+```
+
+### 🧪 Testando a API
+
+```bash
+# Teste básico de conectividade
+curl http://localhost:3000/api/articles
+
+# Se o seed foi executado, deve retornar artigos
+curl http://localhost:3000/api/users
 ```
 
 ---
 
-## 📊 API Endpoints
+## 📊 API Endpoints Completos
 
-### Autenticação
+### 🔐 Autenticação
 
--   `POST /api/auth/login` - Login de usuário
+```http
+POST /api/auth/login    # Login com email/senha
+```
 
-### Usuários
+### 👥 Usuários
 
--   `GET /api/users` - Listar usuários
--   `GET /api/users/:id` - Buscar usuário
--   `POST /api/users` - Criar usuário
--   `PUT /api/users/:id` - Atualizar usuário
--   `DELETE /api/users/:id` - Remover usuário
+```http
+GET    /api/users           # Listar usuários
+GET    /api/users/:id       # Buscar usuário específico
+POST   /api/users/create    # Criar novo usuário
+PUT    /api/users/:id       # Atualizar usuário
+DELETE /api/users/:id       # Remover usuário (soft delete)
+```
 
-### Artigos
+### 📝 Artigos
 
--   `GET /api/articles` - Listar artigos
--   `GET /api/articles/:id` - Buscar artigo
--   `POST /api/articles` - Criar artigo
--   `PUT /api/articles/:id` - Atualizar artigo
--   `DELETE /api/articles/:id` - Remover artigo
+```http
+GET    /api/articles           # Listar todos os artigos
+GET    /api/articles/search    # Busca avançada (?term=react&tagId=uuid&page=1&limit=10)
+GET    /api/articles/:id       # Buscar artigo específico
+POST   /api/articles/create    # Criar novo artigo
+PUT    /api/articles/:id       # Atualizar artigo
+DELETE /api/articles/:id       # Remover artigo (soft delete)
+```
 
-### Tags
+### 🏷️ Tags
 
--   `GET /api/tags` - Listar tags
--   `POST /api/tags` - Criar tag
--   `PUT /api/tags/:id` - Atualizar tag
--   `DELETE /api/tags/:id` - Remover tag
+```http
+GET    /api/tags           # Listar todas as tags
+GET    /api/tags/:id       # Buscar tag específica
+POST   /api/tags/create    # Criar nova tag
+PUT    /api/tags/:id       # Atualizar tag
+DELETE /api/tags/:id       # Remover tag (soft delete)
+```
 
-### Comentários
+### 💬 Comentários
 
--   `GET /api/comments` - Listar comentários
--   `POST /api/comments` - Criar comentário
--   `PUT /api/comments/:id` - Atualizar comentário
--   `DELETE /api/comments/:id` - Remover comentário
+```http
+GET    /api/comments                    # Listar comentários principais
+GET    /api/comments/article/:articleId # Buscar comentários de um artigo (com respostas aninhadas)
+GET    /api/comments/:id               # Buscar comentário específico
+GET    /api/comments/:id/replies       # Buscar respostas de um comentário
+POST   /api/comments/create            # Criar novo comentário ou resposta
+PUT    /api/comments/:id               # Atualizar comentário
+DELETE /api/comments/:id               # Remover comentário (soft delete)
+```
+
+### 📋 Recursos Especiais
+
+#### **Busca Avançada de Artigos**
+
+```http
+GET /api/articles/search?term=react&tagId=uuid&page=1&limit=10
+```
+
+-   Busca por título
+-   Filtro por tag específica
+-   Paginação com metadata completa
+-   Ordenação por data de criação
+
+#### **Comentários Hierárquicos**
+
+```http
+GET /api/comments/article/:articleId
+```
+
+-   Retorna comentários principais com respostas aninhadas
+-   Inclui dados do usuário (nome, avatar)
+-   Ordenação: comentários principais por data DESC, respostas por data ASC
+-   Soft delete aplicado em toda a hierarquia
 
 ---
 
-## 💡 Exemplos de Uso
+## 💡 Exemplos de Uso Completos
 
-### Login
+### 🔐 Autenticação
 
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"email": "admin@email.com", "password": "123456"}'
-```
-
-### Criar Artigo
-
-```bash
-curl -X POST http://localhost:3000/api/articles \
-  -H 'Content-Type: application/json' \
   -d '{
-    "title": "Meu Artigo",
-    "content": "Conteúdo do artigo...",
-    "image": "https://example.com/image.jpg",
-    "authorId": "uuid-do-autor",
-    "tagIds": ["uuid-tag1", "uuid-tag2"]
+    "email": "fred.marques@email.com",
+    "password": "123456"
   }'
 ```
 
-### Resposta de Sucesso
+### 👤 Criar Usuário com Avatar
+
+```bash
+curl -X POST http://localhost:3000/api/users/create \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "João Silva",
+    "email": "joao@email.com",
+    "password": "123456",
+    "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+  }'
+```
+
+### 📝 Criar Artigo com Imagem e Tags
+
+```bash
+curl -X POST http://localhost:3000/api/articles/create \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "Guia Completo de React Hooks",
+    "content": "React Hooks revolucionaram a forma como desenvolvemos componentes...",
+    "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=600",
+    "authorId": "uuid-do-autor",
+    "tagIds": ["react-tag-uuid", "javascript-tag-uuid", "frontend-tag-uuid"]
+  }'
+```
+
+### 🔍 Busca Avançada de Artigos
+
+```bash
+# Buscar artigos sobre React
+curl "http://localhost:3000/api/articles/search?term=react&page=1&limit=5"
+
+# Buscar artigos de uma tag específica
+curl "http://localhost:3000/api/articles/search?tagId=frontend-tag-uuid&page=1&limit=10"
+
+# Busca combinada
+curl "http://localhost:3000/api/articles/search?term=javascript&tagId=frontend-tag-uuid&page=1&limit=5"
+```
+
+### 💬 Sistema de Comentários
+
+```bash
+# Criar comentário principal
+curl -X POST http://localhost:3000/api/comments/create \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "content": "Excelente artigo sobre React Hooks!",
+    "articleId": "artigo-uuid",
+    "userId": "usuario-uuid"
+  }'
+
+# Criar resposta a um comentário
+curl -X POST http://localhost:3000/api/comments/create \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "content": "Concordo totalmente!",
+    "articleId": "artigo-uuid",
+    "userId": "outro-usuario-uuid",
+    "parentId": "comentario-pai-uuid"
+  }'
+
+# Buscar todos os comentários de um artigo (com respostas aninhadas)
+curl "http://localhost:3000/api/comments/article/artigo-uuid"
+```
+
+### 📊 Resposta de Sucesso com Paginação
 
 ```json
 {
     "success": true,
     "data": {
-        /* dados retornados */
+        "items": [
+            {
+                "id": "uuid",
+                "title": "Artigo de Exemplo",
+                "content": "Conteúdo...",
+                "image": "https://example.com/image.jpg",
+                "createdAt": "2025-09-08T12:00:00Z",
+                "tags": [
+                    {
+                        "tagId": "tag-uuid",
+                        "tag": { "name": "React" }
+                    }
+                ]
+            }
+        ],
+        "meta": {
+            "page": 1,
+            "limit": 10,
+            "total": 25,
+            "totalPages": 3,
+            "hasNext": true,
+            "hasPrev": false
+        }
     },
-    "message": "Operação realizada com sucesso",
+    "message": "Artigos encontrados com sucesso",
     "statusCode": 200
 }
 ```
 
-### Resposta de Erro
+### 💬 Resposta de Comentários Hierárquicos
+
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": "comment-uuid",
+            "content": "Ótimo artigo!",
+            "createdAt": "2025-09-08T12:00:00Z",
+            "user": {
+                "id": "user-uuid",
+                "name": "João Silva",
+                "avatar": "https://example.com/avatar.jpg"
+            },
+            "replies": [
+                {
+                    "id": "reply-uuid",
+                    "content": "Concordo!",
+                    "createdAt": "2025-09-08T12:30:00Z",
+                    "user": {
+                        "id": "user2-uuid",
+                        "name": "Maria Santos",
+                        "avatar": "https://example.com/avatar2.jpg"
+                    }
+                }
+            ]
+        }
+    ],
+    "message": "Comentários do artigo buscados com sucesso",
+    "statusCode": 200
+}
+```
+
+### ❌ Resposta de Erro com Validação
 
 ```json
 {
     "success": false,
     "data": null,
-    "error": "Mensagem de erro específica",
+    "error": "Validation error",
+    "details": [
+        "Título deve ter no mínimo 3 caracteres",
+        "Um artigo deve ter no mínimo 1 tags"
+    ],
     "statusCode": 400
 }
 ```
@@ -584,20 +806,69 @@ model Comment {
 
 ---
 
-## 🤝 Contribuindo
+## 🗄️ Dados de Exemplo (Seed)
 
-1. Fork o projeto
-2. Crie uma branch: `git checkout -b feature/nova-funcionalidade`
-3. Commit: `git commit -m 'feat: adiciona nova funcionalidade'`
-4. Push: `git push origin feature/nova-funcionalidade`
-5. Abra um Pull Request
+O projeto inclui um sistema completo de seed com dados realistas para desenvolvimento e testes:
 
-### Convenções
+### 👥 Usuários Pré-cadastrados
 
--   Use Conventional Commits
--   Mantenha TypeScript strict mode
--   Siga os padrões Result Pattern
--   Adicione testes para novas funcionalidades
+Todos os usuários têm senha: **`123456`**
+
+| Nome                | Email                     | Avatar                                                                                                |
+| ------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Fred Marques**    | fred.marques@email.com    | [Avatar](https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face) |
+| **Carlos Henrique** | carlos.henrique@email.com | [Avatar](https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face) |
+| **Carlos Eduardo**  | carlos.eduardo@email.com  | [Avatar](https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face) |
+| **Geovana Rocha**   | geovana.rocha@email.com   | [Avatar](https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face) |
+
+### 📝 Artigos de Exemplo
+
+8 artigos técnicos sobre:
+
+-   **Agronegócio** - A Revolução da Grão Direto no setor
+-   **DevOps** - CI/CD em Ambientes Ágeis, Práticas para Times Distribuídos
+-   **Backend** - Importância de NoSQL em Sistemas Escaláveis
+-   **Cloud** - Kubernetes e Orquestração de Contêineres
+-   **Segurança** - Desafios em Arquiteturas Serverless
+-   **Frontend** - Evolução com Frameworks Modernos (React, Angular, Vue)
+
+### 🏷️ Tags Organizadas
+
+Categorias técnicas incluem:
+
+-   **Tecnologias**: React, NoSQL, Kubernetes, Serverless
+-   **Metodologias**: CI/CD, DevOps, Agilidade
+-   **Domínios**: Grão Direto, Agronegócio, Frontend, Backend
+-   **Conceitos**: Escalabilidade, Colaboração, Segurança, Cloud
+
+### 💬 Comentários Interativos
+
+-   Comentários principais em cada artigo
+-   Respostas aninhadas demonstrando threading
+-   Diferentes autores interagindo entre si
+-   Timestamps realistas para demonstração
+
+### 🚀 Executar Seed
+
+```bash
+# Popular banco com todos os dados
+yarn seed
+
+# O que será criado:
+# ✅ 4 usuários com avatares do Unsplash
+# ✅ 8 artigos técnicos com imagens
+# ✅ 12 tags categorizadas
+# ✅ 24 relacionamentos artigo-tag
+# ✅ 10+ comentários com respostas aninhadas
+```
+
+### 🔄 Reset e Recriar
+
+```bash
+# Limpar tudo e recriar do zero
+yarn prisma:reset
+yarn seed
+```
 
 ---
 
