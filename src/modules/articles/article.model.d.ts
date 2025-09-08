@@ -33,4 +33,26 @@ interface IArticleResponseDTO extends Omit<IArticle, 'deletedAt'> {}
 
 interface IArticleSearchDTO extends ISearchWithPagination {
     term: string;
+    tagId?: string;
+}
+
+interface IArticleSearchResponseDTO extends IArticle {
+    tags: Array<{
+        tagId: string;
+        tag: {
+            name: string;
+        };
+    }>;
+}
+
+interface IPaginatedArticles {
+    items: Array<IArticleSearchResponseDTO>;
+    meta: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+    };
 }

@@ -55,3 +55,8 @@ export const updateCommentSchema = z.object({
 export const getRepliesSchema = paginationSchema.extend({
     id: z.uuid('ID do comentário deve ser um UUID válido'),
 });
+
+//= =================================================================================
+export const getCommentsByArticleSchema = z.object({
+    articleId: z.uuid('ID do artigo deve ser um UUID válido'),
+});

@@ -41,7 +41,21 @@ export const createArticleSchema = z.object({
             MAX_CONTENT_LENGTH,
             `Conteúdo deve ter no máximo ${MAX_CONTENT_LENGTH} caracteres`
         ),
-    image: z.url('URL da imagem deve ser válida').optional(),
+    image: z
+        .string()
+        .nullable()
+        .optional()
+        .refine(
+            (val) => {
+                if (!val || val === null || val.trim() === '') {
+                    return true;
+                }
+                return z.string().url().safeParse(val).success;
+            },
+            {
+                message: 'URL da imagem deve ser válida',
+            }
+        ),
     authorId: z.uuid('ID do autor deve ser um UUID válido'),
     tagIds: z
         .array(z.uuid('ID da tag deve ser um UUID válido'))
@@ -107,4 +121,5 @@ export const searchArticleSchema = paginationSchema.extend({
             MAX_TERM_LENGTH,
             `A busca deve ter no máximo ${MAX_TERM_LENGTH} caracteres`
         ),
+    tagId: z.string().optional(),
 });

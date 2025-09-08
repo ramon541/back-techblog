@@ -34,7 +34,6 @@ export const articleController: IApiArticleController = {
     create: async (req, res, next) => {
         try {
             articleLogger.info('Starting article creation');
-
             const validatedData = createArticleSchema.parse(req.body);
 
             const result = await articleService.create(validatedData);
@@ -60,18 +59,21 @@ export const articleController: IApiArticleController = {
             const page = req.query.page ? Number(req.query.page) : 1;
             const limit = req.query.limit ? Number(req.query.limit) : 10;
             const term = req.query.term ? String(req.query.term) : '';
+            const tagId = req.query.tagId ? String(req.query.tagId) : '';
 
             const validatedData = searchArticleSchema.parse({
                 page,
                 limit,
                 term,
+                tagId,
             });
 
             const result = await articleService.search(validatedData);
 
             if (result.success)
                 articleLogger.success('Article search completed successfully', {
-                    count: result.data.length,
+                    count: result.data.items.length,
+                    meta: result.data.meta,
                 });
             else articleLogger.warn('Article search failed', result);
 

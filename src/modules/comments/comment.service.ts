@@ -118,6 +118,38 @@ export const commentService = {
     },
 
     //= =================================================================================
+    getByArticle: async ({
+        articleId,
+    }: Pick<IComment, 'articleId'>): Promise<
+        Result<ICommentResponseDTO[], string>
+    > => {
+        try {
+            const article = await articleRepository.findById({
+                id: articleId,
+            });
+            if (!article)
+                return Result.error(
+                    ApplicationErrorEnum.NotFound,
+                    'Artigo não encontrado'
+                );
+
+            const comments = await commentRepository.findByArticle({
+                articleId,
+            });
+
+            return Result.ok(
+                comments,
+                'Comentários do artigo buscados com sucesso'
+            );
+        } catch {
+            return Result.error(
+                ApplicationErrorEnum.InfrastructureError,
+                'Erro ao buscar comentários do artigo'
+            );
+        }
+    },
+
+    //= =================================================================================
     update: async ({
         id,
         ...rest

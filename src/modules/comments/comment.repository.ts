@@ -71,6 +71,46 @@ export const commentRepository = {
     count: async (): Promise<number> => {
         return prisma.comment.count();
     },
+
+    //= =================================================================================
+    findByArticle: async ({
+        articleId,
+    }: Pick<IComment, 'articleId'>): Promise<IComment[]> => {
+        return prisma.comment.findMany({
+            where: {
+                articleId: articleId,
+                deletedAt: null,
+                parentId: null,
+            },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatar: true,
+                    },
+                },
+                replies: {
+                    where: {
+                        deletedAt: null,
+                    },
+                    orderBy: { createdAt: 'asc' },
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                avatar: true,
+                                createdAt: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    },
 };
 
 //= =================================================================================

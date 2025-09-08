@@ -17,6 +17,7 @@ import type { RequestHandler } from 'express';
 import { commentService } from './comment.service.js';
 import {
     createCommentSchema,
+    getCommentsByArticleSchema,
     getCommentSchema,
     getRepliesSchema,
     updateCommentSchema,
@@ -28,6 +29,7 @@ const commentLogger = logger.createModuleLogger('COMMENT');
 
 export type IApiCommentController = IApiControllerBase<RequestHandler> & {
     getReplies: RequestHandler;
+    getByArticle: RequestHandler;
 };
 
 export const commentController: IApiCommentController = {
@@ -129,6 +131,42 @@ export const commentController: IApiCommentController = {
                     }
                 );
             else commentLogger.warn('Comment replies retrieval failed', result);
+
+            res.status(result.statusCode).json(result);
+            return;
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    //= =================================================================================
+    getByArticle: async (req, res, next) => {
+        try {
+            commentLogger.info('Starting comments by article retrieval');
+            const { articleId } = req.params;
+
+            const validatedData = getCommentsByArticleSchema.parse({
+                articleId,
+            });
+
+            const result = await commentService.getByArticle(validatedData);
+
+            commentLogger.info('Comments by article retrieval process', {
+                articleId,
+            });
+
+            if (result.success)
+                commentLogger.success(
+                    'Comments by article retrieved successfully',
+                    {
+                        articleId,
+                    }
+                );
+            else
+                commentLogger.warn(
+                    'Comments by article retrieval failed',
+                    result
+                );
 
             res.status(result.statusCode).json(result);
             return;

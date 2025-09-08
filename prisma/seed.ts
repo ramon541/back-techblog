@@ -102,16 +102,37 @@ async function main() {
         ...new Set(articlesData.map((article) => article.author)),
     ];
 
+    const avatarMap = new Map([
+        [
+            'Fred Marques',
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+        ],
+        [
+            'Carlos Henrique',
+            'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+        ],
+        [
+            'Carlos Eduardo',
+            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+        ],
+        [
+            'Geovana Rocha',
+            'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+        ],
+    ]);
+
     const usersMap = new Map();
 
     for (const authorName of uniqueAuthors) {
         const email = nameToEmail(authorName);
+        const avatar = avatarMap.get(authorName);
 
         const user = await prisma.user.create({
             data: {
                 name: authorName,
-                email: email,
+                email,
                 password: hashedPassword,
+                avatar,
             },
         });
 

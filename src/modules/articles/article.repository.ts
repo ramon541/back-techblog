@@ -23,22 +23,80 @@ export const articleRepository = {
     //= =================================================================================
     findByTerm: async ({
         term,
+        tagId,
         page = 1,
         limit = 10,
-    }: IArticleSearchDTO): Promise<Array<IArticle>> => {
+    }: IArticleSearchDTO): Promise<Array<IArticleSearchResponseDTO>> => {
+        const orConditions = [];
+        const andConditions = [];
+
+        if (term && term.trim() !== '') {
+            orConditions.push({ title: { contains: term } });
+        }
+
+        if (tagId && tagId.trim() !== '') {
+            andConditions.push({
+                tags: {
+                    some: {
+                        tagId: tagId,
+                    },
+                },
+            });
+        }
+
         return prisma.article.findMany({
             where: {
                 deletedAt: null,
-                OR: [
-                    { title: { contains: term } },
-                    { author: { name: { contains: term } } },
-                ],
+                ...(orConditions.length > 0 && { OR: orConditions }),
+                ...(andConditions.length > 0 && { AND: andConditions }),
             },
             include: {
-                author: true,
+                tags: {
+                    select: {
+                        tagId: true,
+                        tag: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
             },
             skip: (page - 1) * limit,
             take: limit,
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    },
+
+    //= =================================================================================
+    countByTerm: async ({
+        term,
+        tagId,
+    }: Omit<IArticleSearchDTO, 'page' | 'limit'>): Promise<number> => {
+        const orConditions = [];
+
+        if (term && term.trim() !== '') {
+            orConditions.push({ title: { contains: term } });
+            orConditions.push({ author: { name: { contains: term } } });
+        }
+
+        if (tagId && tagId.trim() !== '') {
+            orConditions.push({
+                tags: {
+                    some: {
+                        tagId: tagId,
+                    },
+                },
+            });
+        }
+
+        return prisma.article.count({
+            where: {
+                deletedAt: null,
+                ...(orConditions.length > 0 && { OR: orConditions }),
+            },
         });
     },
 
@@ -57,6 +115,23 @@ export const articleRepository = {
     findById: async (id: Pick<IArticle, 'id'>): Promise<IArticle | null> => {
         return prisma.article.findUnique({
             where: id,
+            include: {
+                author: {
+                    select: {
+                        name: true,
+                    },
+                },
+                tags: {
+                    select: {
+                        tagId: true,
+                        tag: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
     },
 

@@ -72,11 +72,34 @@ export const articleService = {
     //= =================================================================================
     search: async (
         data: IArticleSearchDTO
-    ): Promise<Result<IArticleResponseDTO[], string>> => {
+    ): Promise<Result<IPaginatedArticles>> => {
         try {
-            const articles = await articleRepository.findByTerm(data);
-            return Result.ok(articles, 'Artigos encontrados com sucesso');
-        } catch {
+            const [articles, total] = await Promise.all([
+                articleRepository.findByTerm(data),
+                articleRepository.countByTerm({
+                    term: data.term,
+                    tagId: data.tagId,
+                }),
+            ]);
+
+            const page = data.page ?? 1;
+            const limit = data.limit ?? 10;
+            const totalPages = Math.ceil(total / limit);
+            const hasNext = page < totalPages;
+            const hasPrev = page > 1;
+
+            return Result.ok({
+                items: articles,
+                meta: {
+                    page,
+                    limit,
+                    total,
+                    totalPages,
+                    hasNext,
+                    hasPrev,
+                },
+            });
+        } catch (error) {
             return Result.error(
                 ApplicationErrorEnum.InfrastructureError,
                 'Erro ao buscar artigos'
